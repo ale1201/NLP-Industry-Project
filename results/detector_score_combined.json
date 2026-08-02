@@ -1,0 +1,22 @@
+{
+  "mode": "combined",
+  "tp": 61,
+  "fp": 0,
+  "tn": 352,
+  "fn": 0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "recall_by_technique": {
+    "invisible_render_mode": "9/9",
+    "near_background": "9/9",
+    "offpage": "7/7",
+    "tiny_font": "12/12",
+    "transparent": "13/13",
+    "white_on_white": "11/11"
+  },
+  "false_positive_by_negtype": {
+    "benign_hidden": "0/133",
+    "clean": "0/219"
+  }
+}

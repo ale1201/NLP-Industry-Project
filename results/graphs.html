@@ -1,0 +1,485 @@
+<title>PDF Injection Corpus — Dataset &amp; Detector Results</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6; /* blue   */
+    --series-2:       #eb6834; /* orange */
+    --good:           #0ca30c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --series-2:       #d95926;
+      --good:           #0ca30c;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --series-2:       #d95926;
+    --good:           #0ca30c;
+  }
+
+  * { box-sizing: border-box; }
+  .viz-root {
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 32px 20px 64px;
+    min-height: 100%;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  h1 { font-size: 22px; font-weight: 650; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0 0 28px; max-width: 66ch; }
+  h2 { font-size: 15px; font-weight: 650; margin: 0 0 2px; }
+  .section-note { color: var(--text-secondary); font-size: 12.5px; margin: 0 0 14px; max-width: 70ch; }
+  section { margin-bottom: 40px; }
+
+  /* stat tiles */
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 36px; }
+  .tile {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .tile .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+  .tile .value { font-size: 26px; font-weight: 650; line-height: 1; }
+  .tile .value.good { color: var(--good); }
+
+  /* chart card */
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px 14px;
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* legend */
+  .legend { display: flex; gap: 16px; margin: 2px 0 14px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+
+  /* bar chart (grouped, vertical columns) */
+  .chart { position: relative; }
+  .plot {
+    display: flex; align-items: flex-end; gap: 22px; height: 190px;
+    border-bottom: 1px solid var(--baseline); padding-top: 22px;
+  }
+  .group { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; }
+  .bars { display: flex; align-items: flex-end; gap: 3px; height: 100%; width: 100%; justify-content: center; }
+  .bar {
+    width: 22px; max-width: 24px; border-radius: 4px 4px 0 0;
+    position: relative; cursor: pointer; transition: filter 120ms ease;
+  }
+  .bar:hover, .bar:focus-visible { filter: brightness(1.12); outline: none; }
+  .bar .cap {
+    position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; color: var(--text-secondary); white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .group .xlabel { margin-top: 8px; font-size: 11.5px; color: var(--text-secondary); text-align: center; }
+
+  /* tooltip */
+  #tooltip {
+    position: fixed; pointer-events: none; z-index: 50;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    opacity: 0; transform: translateY(4px); transition: opacity 100ms ease, transform 100ms ease;
+    max-width: 220px;
+  }
+  #tooltip.show { opacity: 1; transform: translateY(0); }
+  #tooltip .row { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  #tooltip .row + .row { margin-top: 3px; }
+  #tooltip .key { width: 10px; height: 2px; border-radius: 1px; flex: none; }
+  #tooltip .val { font-weight: 650; color: var(--text-primary); }
+  #tooltip .name { color: var(--text-secondary); }
+  #tooltip .title { color: var(--text-muted); font-size: 11px; margin-bottom: 4px; }
+
+  details.tbl { margin-top: 10px; }
+  details.tbl summary {
+    cursor: pointer; font-size: 12px; color: var(--text-secondary); user-select: none;
+  }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px; }
+  table th, table td {
+    text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--gridline);
+    font-variant-numeric: tabular-nums;
+  }
+  table th:first-child, table td:first-child { text-align: left; font-variant-numeric: normal; }
+  table th { color: var(--text-secondary); font-weight: 600; }
+
+  .callout {
+    font-size: 12.5px; color: var(--text-secondary); background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-top: 14px;
+  }
+  .callout b { color: var(--text-primary); }
+
+  @media (max-width: 720px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="viz-root">
+  <div class="wrap">
+    <h1>PDF Prompt-Injection Corpus &amp; Detector</h1>
+    <p class="subtitle">
+      Generated corpus (<code>dataset_builder.py</code>, seed 13, 50 payloads) and the
+      layered detector (<code>detector.py</code>) scored against the held-out test split.
+    </p>
+
+    <div class="tiles">
+      <div class="tile"><div class="label">Total PDFs generated</div><div class="value">2,000</div></div>
+      <div class="tile"><div class="label">Positive rate (overall)</div><div class="value">20.0%</div></div>
+      <div class="tile"><div class="label">Combined-mode precision</div><div class="value good">1.00</div></div>
+      <div class="tile"><div class="label">Combined-mode recall</div><div class="value good">1.00</div></div>
+    </div>
+
+    <!-- ============================================================= -->
+    <section>
+      <h2>Dataset composition</h2>
+      <p class="section-note">
+        Group-aware split by payload id / template — no payload appears in more than one split.
+        0 leakage groups confirmed across train/val/test.
+      </p>
+
+      <div class="card">
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--series-1)"></span>Positive</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--series-2)"></span>Negative</span>
+        </div>
+        <div class="chart" data-chart="splits">
+          <div class="plot" id="plot-splits"></div>
+        </div>
+        <details class="tbl">
+          <summary>Show table</summary>
+          <table id="tbl-splits"></table>
+        </details>
+      </div>
+    </section>
+
+    <section>
+      <div class="grid2">
+        <div class="card">
+          <h2>Positives by hiding technique</h2>
+          <p class="section-note">Count of injected PDFs using each technique (train+val+test).</p>
+          <div class="chart" data-chart="pos-tech">
+            <div class="plot" id="plot-pos-tech"></div>
+          </div>
+          <details class="tbl">
+            <summary>Show table</summary>
+            <table id="tbl-pos-tech"></table>
+          </details>
+        </div>
+
+        <div class="card">
+          <h2>Negatives by type</h2>
+          <p class="section-note">Clean, benign-hidden (hard negative), and near-miss-visible negatives.</p>
+          <div class="chart" data-chart="neg-type">
+            <div class="plot" id="plot-neg-type"></div>
+          </div>
+          <details class="tbl">
+            <summary>Show table</summary>
+            <table id="tbl-neg-type"></table>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <section>
+      <h2>Detector performance — test split (413 PDFs, 61 positive)</h2>
+      <p class="section-note">
+        <b>structural</b> flags any hidden text found. <b>combined</b> additionally requires the
+        recovered hidden text to score as instruction-like via the trained semantic model.
+      </p>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--series-1)"></span>structural</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--series-2)"></span>combined</span>
+        </div>
+        <div class="chart" data-chart="metrics">
+          <div class="plot" id="plot-metrics"></div>
+        </div>
+        <details class="tbl">
+          <summary>Show table</summary>
+          <table id="tbl-metrics"></table>
+        </details>
+        <div class="callout">
+          <b>Why combined wins:</b> structural mode reaches perfect recall (1.00) but only
+          0.314 precision — it flags all 133 benign-hidden negatives as attacks, since it can't
+          tell "invisible" from "malicious." The semantic filter in combined mode removes those
+          false positives without losing a single true positive.
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h2>False positives by negative type</h2>
+          <p class="section-note">Out of 133 benign-hidden and 219 clean negatives in the test split.</p>
+          <div class="legend">
+            <span class="legend-item"><span class="legend-swatch" style="background:var(--series-1)"></span>structural</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:var(--series-2)"></span>combined</span>
+          </div>
+          <div class="chart" data-chart="fp">
+            <div class="plot" id="plot-fp"></div>
+          </div>
+          <details class="tbl">
+            <summary>Show table</summary>
+            <table id="tbl-fp"></table>
+          </details>
+        </div>
+
+        <div class="card">
+          <h2>Recall by technique (combined mode)</h2>
+          <p class="section-note">Recall rate per technique — sample size (n) shown on hover; all techniques hit 100%.</p>
+          <div class="chart" data-chart="recall-tech">
+            <div class="plot" id="plot-recall-tech"></div>
+          </div>
+          <details class="tbl">
+            <summary>Show table</summary>
+            <table id="tbl-recall-tech"></table>
+          </details>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+(function () {
+  "use strict";
+  var tooltip = document.getElementById("tooltip");
+
+  function showTooltip(el, title, rows) {
+    tooltip.innerHTML = "";
+    var t = document.createElement("div");
+    t.className = "title";
+    t.textContent = title;
+    tooltip.appendChild(t);
+    rows.forEach(function (r) {
+      var row = document.createElement("div");
+      row.className = "row";
+      var key = document.createElement("span");
+      key.className = "key";
+      key.style.background = r.color;
+      var name = document.createElement("span");
+      name.className = "name";
+      name.textContent = r.name + ":";
+      var val = document.createElement("span");
+      val.className = "val";
+      val.textContent = r.value;
+      row.appendChild(key); row.appendChild(name); row.appendChild(val);
+      tooltip.appendChild(row);
+    });
+    tooltip.classList.add("show");
+  }
+  function moveTooltip(evt) {
+    var pad = 14;
+    var x = evt.clientX + pad, y = evt.clientY + pad;
+    var rect = tooltip.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth) x = evt.clientX - rect.width - pad;
+    if (y + rect.height > window.innerHeight) y = evt.clientY - rect.height - pad;
+    tooltip.style.left = x + "px";
+    tooltip.style.top = y + "px";
+  }
+  function hideTooltip() { tooltip.classList.remove("show"); }
+
+  var COLOR = { s1: "var(--series-1)", s2: "var(--series-2)" };
+  var COLOR_HEX = { s1: getComputedStyle(document.documentElement).getPropertyValue ? null : null };
+
+  // Resolve CSS var to actual color for tooltip swatches (computed on the root each call).
+  function resolve(varName) {
+    var root = document.querySelector(".viz-root");
+    return getComputedStyle(root).getPropertyValue(varName).trim();
+  }
+
+  function bar(colorVar, heightPct, capText) {
+    var b = document.createElement("div");
+    b.className = "bar";
+    b.style.background = colorVar;
+    b.style.height = heightPct + "%";
+    b.tabIndex = 0;
+    if (capText != null) {
+      var cap = document.createElement("span");
+      cap.className = "cap";
+      cap.textContent = capText;
+      b.appendChild(cap);
+    }
+    return b;
+  }
+
+  function renderGrouped(plotId, groups, seriesKeys, seriesColors, seriesNames, maxVal, fmt) {
+    var plot = document.getElementById(plotId);
+    plot.innerHTML = "";
+    groups.forEach(function (g) {
+      var groupEl = document.createElement("div");
+      groupEl.className = "group";
+      var barsEl = document.createElement("div");
+      barsEl.className = "bars";
+      seriesKeys.forEach(function (sk, i) {
+        var v = g.values[sk];
+        var pct = maxVal > 0 ? (v / maxVal) * 100 : 0;
+        var b = bar(seriesColors[i], pct, fmt ? fmt(v) : v);
+        b.addEventListener("pointerenter", function (e) {
+          var rows = seriesKeys.map(function (sk2, j) {
+            return { color: resolve(seriesColors[j].match(/--[\w-]+/)[0]), name: seriesNames[j], value: fmt ? fmt(g.values[sk2]) : g.values[sk2] };
+          });
+          showTooltip(b, g.label, rows);
+          moveTooltip(e);
+        });
+        b.addEventListener("pointermove", moveTooltip);
+        b.addEventListener("pointerleave", hideTooltip);
+        b.addEventListener("focus", function (e) {
+          var rows = seriesKeys.map(function (sk2, j) {
+            return { color: resolve(seriesColors[j].match(/--[\w-]+/)[0]), name: seriesNames[j], value: fmt ? fmt(g.values[sk2]) : g.values[sk2] };
+          });
+          showTooltip(b, g.label, rows);
+          var r = b.getBoundingClientRect();
+          tooltip.style.left = r.left + "px";
+          tooltip.style.top = (r.top - 8) + "px";
+        });
+        b.addEventListener("blur", hideTooltip);
+        barsEl.appendChild(b);
+      });
+      groupEl.appendChild(barsEl);
+      var lbl = document.createElement("div");
+      lbl.className = "xlabel";
+      lbl.textContent = g.label;
+      groupEl.appendChild(lbl);
+      plot.appendChild(groupEl);
+    });
+  }
+
+  function renderSingle(plotId, items, color, maxVal, fmt) {
+    renderGrouped(plotId, items.map(function (it) { return { label: it.label, values: { v: it.value } }; }),
+      ["v"], [color], ["value"], maxVal, fmt);
+  }
+
+  function fillTable(tableId, headers, rows) {
+    var tbl = document.getElementById(tableId);
+    tbl.innerHTML = "";
+    var thead = document.createElement("thead");
+    var htr = document.createElement("tr");
+    headers.forEach(function (h) {
+      var th = document.createElement("th");
+      th.textContent = h;
+      htr.appendChild(th);
+    });
+    thead.appendChild(htr);
+    tbl.appendChild(thead);
+    var tbody = document.createElement("tbody");
+    rows.forEach(function (r) {
+      var tr = document.createElement("tr");
+      r.forEach(function (cell) {
+        var td = document.createElement("td");
+        td.textContent = cell;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+  }
+
+  // ---- data ----
+  var splits = [
+    { label: "train", values: { pos: 282, neg: 922 } },
+    { label: "val",   values: { pos: 57,  neg: 326 } },
+    { label: "test",  values: { pos: 61,  neg: 352 } }
+  ];
+  renderGrouped("plot-splits", splits, ["pos", "neg"], [COLOR.s1, COLOR.s2], ["positive", "negative"], 1000, function (v) { return v.toLocaleString(); });
+  fillTable("tbl-splits", ["split", "positive", "negative", "total", "pos rate"], [
+    ["train", "282", "922", "1,204", "23.4%"],
+    ["val", "57", "326", "383", "14.9%"],
+    ["test", "61", "352", "413", "14.8%"],
+    ["overall", "400", "1,600", "2,000", "20.0%"]
+  ]);
+
+  var posTech = [
+    { label: "tiny_font", value: 78 },
+    { label: "near_bg", value: 69 },
+    { label: "transparent", value: 69 },
+    { label: "offpage", value: 65 },
+    { label: "render_mode", value: 63 },
+    { label: "white_on_white", value: 56 }
+  ];
+  renderSingle("plot-pos-tech", posTech, COLOR.s1, 78, function (v) { return v; });
+  fillTable("tbl-pos-tech", ["technique", "positives"], posTech.map(function (d) { return [d.label, d.value]; }));
+
+  var negType = [
+    { label: "clean", value: 886 },
+    { label: "benign_hidden", value: 482 },
+    { label: "near_miss", value: 232 }
+  ];
+  renderSingle("plot-neg-type", negType, COLOR.s1, 886, function (v) { return v; });
+  fillTable("tbl-neg-type", ["negative type", "count"], negType.map(function (d) { return [d.label, d.value]; }));
+
+  var metrics = [
+    { label: "precision", values: { structural: 0.314, combined: 1.0 } },
+    { label: "recall",    values: { structural: 1.0,   combined: 1.0 } },
+    { label: "f1",        values: { structural: 0.478, combined: 1.0 } }
+  ];
+  renderGrouped("plot-metrics", metrics, ["structural", "combined"], [COLOR.s1, COLOR.s2], ["structural", "combined"], 1.0, function (v) { return v.toFixed(3); });
+  fillTable("tbl-metrics", ["metric", "structural", "combined"], [
+    ["precision", "0.314", "1.000"],
+    ["recall", "1.000", "1.000"],
+    ["f1", "0.478", "1.000"]
+  ]);
+
+  var fp = [
+    { label: "clean (n=219)",         values: { structural: 0,   combined: 0 } },
+    { label: "benign_hidden (n=133)", values: { structural: 133, combined: 0 } }
+  ];
+  renderGrouped("plot-fp", fp, ["structural", "combined"], [COLOR.s1, COLOR.s2], ["structural", "combined"], 133, function (v) { return v; });
+  fillTable("tbl-fp", ["negative type", "structural FP", "combined FP"], [
+    ["clean", "0 / 219", "0 / 219"],
+    ["benign_hidden", "133 / 133", "0 / 133"]
+  ]);
+
+  // Encode the RATE (100% for every technique), not the raw count — equal
+  // bar heights correctly show equal recall; sample size lives in the label/tooltip.
+  var recallN = { render_mode: 9, near_bg: 9, offpage: 7, tiny_font: 12, transparent: 13, white_on_white: 11 };
+  var recallTech = Object.keys(recallN).map(function (k) { return { label: k, value: 100 }; });
+  renderSingle("plot-recall-tech", recallTech, COLOR.s1, 100, function (v) { return "100%"; });
+  // Patch the x-axis labels to include n, since renderSingle only knows the rate.
+  Array.prototype.forEach.call(document.querySelectorAll("#plot-recall-tech .group"), function (g, i) {
+    var key = recallTech[i].label;
+    g.querySelector(".xlabel").textContent = key + " (n=" + recallN[key] + ")";
+  });
+  fillTable("tbl-recall-tech", ["technique", "recall"], [
+    ["render_mode", "9/9 (100%)"],
+    ["near_bg", "9/9 (100%)"],
+    ["offpage", "7/7 (100%)"],
+    ["tiny_font", "12/12 (100%)"],
+    ["transparent", "13/13 (100%)"],
+    ["white_on_white", "11/11 (100%)"]
+  ]);
+})();
+</script>

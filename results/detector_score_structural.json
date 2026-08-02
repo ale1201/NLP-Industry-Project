@@ -1,0 +1,22 @@
+{
+  "mode": "structural",
+  "tp": 61,
+  "fp": 133,
+  "tn": 219,
+  "fn": 0,
+  "precision": 0.314,
+  "recall": 1.0,
+  "f1": 0.478,
+  "recall_by_technique": {
+    "invisible_render_mode": "9/9",
+    "near_background": "9/9",
+    "offpage": "7/7",
+    "tiny_font": "12/12",
+    "transparent": "13/13",
+    "white_on_white": "11/11"
+  },
+  "false_positive_by_negtype": {
+    "benign_hidden": "133/133",
+    "clean": "0/219"
+  }
+}
