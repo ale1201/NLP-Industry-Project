@@ -1,0 +1,64 @@
+{
+  "seed": 13,
+  "n_positive": 400,
+  "neg_ratio": 4,
+  "templates": [
+    "resume",
+    "paper",
+    "invoice",
+    "cover_letter"
+  ],
+  "techniques": [
+    "white_on_white",
+    "near_background",
+    "tiny_font",
+    "invisible_render_mode",
+    "transparent",
+    "offpage"
+  ],
+  "placements": [
+    "header",
+    "mid",
+    "footer"
+  ],
+  "n_payloads": 50,
+  "overall": {
+    "n": 2000,
+    "pos": 400,
+    "neg": 1600,
+    "pos_rate": 0.2
+  },
+  "splits": {
+    "train": {
+      "n": 1204,
+      "pos": 282,
+      "neg": 922,
+      "pos_rate": 0.234
+    },
+    "val": {
+      "n": 383,
+      "pos": 57,
+      "neg": 326,
+      "pos_rate": 0.149
+    },
+    "test": {
+      "n": 413,
+      "pos": 61,
+      "neg": 352,
+      "pos_rate": 0.148
+    }
+  },
+  "positives_by_technique": {
+    "white_on_white": 56,
+    "near_background": 69,
+    "tiny_font": 78,
+    "invisible_render_mode": 63,
+    "transparent": 69,
+    "offpage": 65
+  },
+  "negatives_by_type": {
+    "clean": 886,
+    "benign_hidden": 482,
+    "near_miss": 232
+  }
+}
