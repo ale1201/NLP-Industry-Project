@@ -3,8 +3,8 @@
 
 Pipeline:
 
-Dataset creation
+Dataset creation(deepset)
 
-Make the model , test it using multiple llms
+Make the model , test it using multiple llms(for now logistic regression + tf-idf)
 
 Make the frontend and backend
