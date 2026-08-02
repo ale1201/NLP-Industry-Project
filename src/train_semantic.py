@@ -132,29 +132,55 @@ def load_csv(path):
 # --------------------------------------------------------------------------
 # Train + evaluate
 # --------------------------------------------------------------------------
-def train(rows, seed=0):
-    X = [t for t, _ in rows]
-    y = np.array([l for _, l in rows])
-    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.25,
-                                          random_state=seed, stratify=y)
-    pipe = Pipeline([
+def make_pipeline():
+    return Pipeline([
         ("tfidf", TfidfVectorizer(ngram_range=(1, 2), analyzer="word",
                                   sublinear_tf=True, min_df=2)),
         ("clf", LogisticRegression(max_iter=2000, class_weight="balanced")),
     ])
-    pipe.fit(Xtr, ytr)
+
+
+def evaluate(pipe, Xte, yte):
     pred = pipe.predict(Xte)
     p, r, f, _ = precision_recall_fscore_support(yte, pred, average="binary", zero_division=0)
     report = classification_report(yte, pred, target_names=["benign", "injection"],
                                    zero_division=0)
-    return pipe, {"precision": round(float(p), 3), "recall": round(float(r), 3),
-                  "f1": round(float(f), 3)}, report
+    return {"precision": round(float(p), 3), "recall": round(float(r), 3),
+            "f1": round(float(f), 3)}, report
+
+
+def train(rows, seed=0):
+    """Internal random 75/25 split (used when no explicit held-out set is given)."""
+    X = [t for t, _ in rows]
+    y = np.array([l for _, l in rows])
+    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.25,
+                                          random_state=seed, stratify=y)
+    pipe = make_pipeline()
+    pipe.fit(Xtr, ytr)
+    metrics, report = evaluate(pipe, Xte, yte)
+    return pipe, metrics, report
+
+
+def train_with_holdout(train_rows, test_rows):
+    """Fit on the full training set, evaluate on a separate, already-held-out set
+    (e.g. a public dataset's own train/test split) instead of an internal random split."""
+    Xtr = [t for t, _ in train_rows]
+    ytr = np.array([l for _, l in train_rows])
+    Xte = [t for t, _ in test_rows]
+    yte = np.array([l for _, l in test_rows])
+    pipe = make_pipeline()
+    pipe.fit(Xtr, ytr)
+    metrics, report = evaluate(pipe, Xte, yte)
+    return pipe, metrics, report
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="semantic_model.joblib")
     ap.add_argument("--train-csv", default=None, help="CSV with columns text,label (else synthetic)")
+    ap.add_argument("--test-csv", default=None,
+                     help="Optional held-out CSV (text,label). If given, trains on all of "
+                          "--train-csv and evaluates on this instead of an internal random split.")
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
 
@@ -162,7 +188,13 @@ if __name__ == "__main__":
     n_pos = sum(1 for _, l in rows if l == 1)
     print(f"corpus: {len(rows)} rows  ({n_pos} injection, {len(rows)-n_pos} benign)")
 
-    model, metrics, report = train(rows, args.seed)
+    if args.test_csv:
+        test_rows = load_csv(args.test_csv)
+        n_pos_te = sum(1 for _, l in test_rows if l == 1)
+        print(f"held-out (--test-csv): {len(test_rows)} rows  ({n_pos_te} injection, {len(test_rows)-n_pos_te} benign)")
+        model, metrics, report = train_with_holdout(rows, test_rows)
+    else:
+        model, metrics, report = train(rows, args.seed)
     print("held-out metrics:", json.dumps(metrics))
     print(report)
 

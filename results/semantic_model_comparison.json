@@ -1,0 +1,40 @@
+{
+  "dataset": "deepset/prompt-injections (Hugging Face)",
+  "test_set": "data/deepset_test.csv (116 rows, 60 injection / 56 benign, official split)",
+  "models": {
+    "semantic_model.joblib (synthetic-trained, original)": {
+      "trained_on": "src/train_semantic.py build_corpus() synthetic phrasings (748 rows)",
+      "held_out_on_own_synthetic_split": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "evaluated_on_real_deepset_test": {
+        "precision": 0.63,
+        "recall": 0.283,
+        "f1": 0.391
+      },
+      "evaluated_via_detector_on_our_pdf_test_manifest": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "note": "PAYLOADS in pdf_injection_gen.py share vocabulary with build_corpus() synthetic training text"
+      }
+    },
+    "semantic_model_real.joblib (real-trained, new)": {
+      "trained_on": "data/deepset_train.csv (546 rows, real dataset's own train split)",
+      "evaluated_on_real_deepset_test": {
+        "precision": 0.957,
+        "recall": 0.75,
+        "f1": 0.841
+      },
+      "evaluated_via_detector_on_our_pdf_test_manifest": {
+        "precision": 0.416,
+        "recall": 0.525,
+        "f1": 0.464,
+        "note": "PDF payload phrasing does not match deepset/prompt-injections vocabulary/style"
+      }
+    }
+  },
+  "takeaway": "The synthetic-trained model's perfect 1.0/1.0/1.0 score only holds on text drawn from its own narrow synthetic vocabulary. On unseen real-world injection phrasings (deepset/prompt-injections, multilingual, informal), its F1 collapses to 0.391 -- barely above chance. Retraining on the real dataset's own train split and evaluating on its own held-out test split gives an honest F1 of 0.841, which is the number to trust when reasoning about real-world detector performance. Cross-checking in the other direction confirms the same mismatch: the real-trained model only reaches F1 0.464 on our own synthetic PDF corpus (vs 1.0 for the synthetic-trained model), because our PDF payloads and the deepset dataset use different phrasing styles. The fix is not picking one model, but generating the PDF corpus payloads FROM the real dataset (dataset_builder.py --payloads) so training and evaluation vocabulary actually match."
+}
