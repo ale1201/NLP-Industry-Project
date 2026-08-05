@@ -19,3 +19,11 @@ Whats the benchmark?
 
 
 Make the frontend and backend
+
+05-08-26
+
+Alejandra-> Dataset generation
+Saliq -> Train the model
+Ashhad -> integration
+
+Deadline-> 9th august
