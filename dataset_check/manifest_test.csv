@@ -1,0 +1,352 @@
+filename,label,template,technique,placement,payload_id,payload_category,severity,explicit,hidden_text,split
+neg_00000.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00002.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00004.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00007.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00012.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00015.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00019.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00037.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00043.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00045.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00046.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00049.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00052.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00057.pdf,0,resume,tiny_font,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00059.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00063.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00069.pdf,0,resume,bg_color_match_tiny,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00070.pdf,0,resume,tiny_font,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00071.pdf,0,resume,bg_color_match_tiny,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00075.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00081.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00084.pdf,0,resume,bg_color_match,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00087.pdf,0,resume,bg_color_match,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00089.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00091.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00092.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00096.pdf,0,resume,bg_color_match,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00100.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00101.pdf,0,resume,bg_color_match_tiny,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00105.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00106.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00107.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00109.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00117.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00125.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00134.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00138.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00139.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00143.pdf,0,resume,bg_color_match_tiny,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00144.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00147.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00154.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00156.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00157.pdf,0,resume,tiny_font,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00164.pdf,0,resume,bg_color_match,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00169.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00172.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00177.pdf,0,resume,invisible_render_mode,header,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00179.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00182.pdf,0,resume,bg_color_match_tiny,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00192.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00193.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00196.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00205.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00213.pdf,0,resume,bg_color_match,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00218.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00222.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00229.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00232.pdf,0,resume,bg_color_match_tiny,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00238.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00239.pdf,0,resume,invisible_render_mode,header,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00241.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00242.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00247.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00248.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00250.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00253.pdf,0,resume,tiny_font,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00258.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00259.pdf,0,resume,bg_color_match_tiny,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00268.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00273.pdf,0,resume,bg_color_match_tiny,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00278.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00282.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00286.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00301.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00302.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00303.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00309.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00318.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00319.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00325.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00336.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00338.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00341.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00343.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00348.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00357.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00358.pdf,0,resume,bg_color_match,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00359.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00360.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00361.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00365.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00368.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00370.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00376.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00377.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00379.pdf,0,resume,bg_color_match_tiny,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00389.pdf,0,resume,bg_color_match_tiny,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00390.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00391.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00395.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00396.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00399.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00402.pdf,0,resume,tiny_font,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00409.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00410.pdf,0,resume,tiny_font,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00412.pdf,0,resume,bg_color_match,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00416.pdf,0,resume,white_on_white,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00417.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00433.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00437.pdf,0,resume,invisible_render_mode,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00439.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00440.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00443.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00453.pdf,0,resume,bg_color_match,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00455.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00456.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00461.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00466.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00467.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00475.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00480.pdf,0,resume,white_on_white,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00494.pdf,0,resume,invisible_render_mode,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00496.pdf,0,resume,white_on_white,header,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00503.pdf,0,resume,bg_color_match_tiny,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00512.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00518.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00520.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00523.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00528.pdf,0,resume,tiny_font,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00531.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00546.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00548.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00550.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00553.pdf,0,resume,bg_color_match,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00564.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00565.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00572.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00580.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00581.pdf,0,resume,bg_color_match_tiny,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00595.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00602.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00606.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00611.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00613.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00619.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00622.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00626.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00628.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00635.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00641.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00642.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00655.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00656.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00659.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00660.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00667.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00669.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00670.pdf,0,resume,bg_color_match_tiny,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00672.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00678.pdf,0,resume,bg_color_match,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00679.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00680.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00684.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00686.pdf,0,resume,bg_color_match,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00687.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00704.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00709.pdf,0,resume,bg_color_match,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00713.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00718.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00720.pdf,0,resume,bg_color_match_tiny,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00722.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00729.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00731.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00735.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00740.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00745.pdf,0,resume,bg_color_match_tiny,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00748.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00758.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00781.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00782.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00789.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00790.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00794.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00796.pdf,0,resume,bg_color_match,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00799.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00800.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00810.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00821.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00827.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00829.pdf,0,resume,bg_color_match_tiny,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00830.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00836.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00837.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00838.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00839.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00840.pdf,0,resume,tiny_font,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00842.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00843.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00845.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00852.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00864.pdf,0,resume,invisible_render_mode,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00873.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00882.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00883.pdf,0,resume,bg_color_match_tiny,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00887.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00888.pdf,0,resume,invisible_render_mode,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00895.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00897.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00898.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00902.pdf,0,resume,tiny_font,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00911.pdf,0,resume,bg_color_match_tiny,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00912.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00916.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00919.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00930.pdf,0,resume,tiny_font,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00934.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00938.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00942.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00949.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00954.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00958.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00959.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00960.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00967.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00968.pdf,0,resume,bg_color_match_tiny,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_00971.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_00972.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00973.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00974.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_00982.pdf,0,resume,bg_color_match,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_00983.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01001.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01002.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01006.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01007.pdf,0,resume,invisible_render_mode,header,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01027.pdf,0,resume,bg_color_match,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01040.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01044.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01048.pdf,0,resume,bg_color_match,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01053.pdf,0,resume,bg_color_match_tiny,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01058.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01066.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01070.pdf,0,resume,bg_color_match,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01080.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01085.pdf,0,resume,invisible_render_mode,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01088.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01090.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01094.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01102.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01109.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01121.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01123.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01130.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01131.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01133.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01137.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01141.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01144.pdf,0,resume,bg_color_match,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01145.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01147.pdf,0,resume,bg_color_match,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01150.pdf,0,resume,tiny_font,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01154.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01162.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01165.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01168.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01169.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01172.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01174.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01178.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01197.pdf,0,resume,bg_color_match_tiny,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01207.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01208.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01212.pdf,0,resume,white_on_white,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01214.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01221.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01224.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01227.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01228.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01229.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01230.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01233.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01237.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01240.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01243.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01244.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01257.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01260.pdf,0,resume,invisible_render_mode,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01266.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01267.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01270.pdf,0,resume,bg_color_match_tiny,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01275.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01277.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01280.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01281.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01282.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01284.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01287.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01288.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01289.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01306.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01310.pdf,0,resume,tiny_font,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01328.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01338.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01343.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01347.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01353.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01356.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01358.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01362.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01378.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01380.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01381.pdf,0,resume,tiny_font,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01398.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01399.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01402.pdf,0,resume,bg_color_match,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01412.pdf,0,resume,bg_color_match,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01419.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01420.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01426.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01439.pdf,0,resume,tiny_font,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01443.pdf,0,resume,invisible_render_mode,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01444.pdf,0,resume,tiny_font,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01446.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01453.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01454.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01463.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01466.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01470.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01472.pdf,0,resume,bg_color_match,footer,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01474.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01486.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01487.pdf,0,resume,invisible_render_mode,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01496.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01499.pdf,0,resume,bg_color_match,header,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01507.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01523.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01528.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01529.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01532.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01533.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01538.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01542.pdf,0,resume,tiny_font,header,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01548.pdf,0,resume,bg_color_match_tiny,footer,none,benign_hidden,n/a,False,"Template v3 — internal layout guide, do not print.",test
+neg_01550.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01555.pdf,0,resume,white_on_white,mid,none,benign_hidden,n/a,False,Confidential draft. Prepared by design team.,test
+neg_01557.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01566.pdf,0,resume,white_on_white,footer,none,benign_hidden,n/a,False,"Accessibility tag: section header, reading order 4.",test
+neg_01585.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01587.pdf,0,paper,none,none,none,clean,n/a,False,,test
+neg_01590.pdf,0,paper,none,none,none,clean,n/a,False,,test

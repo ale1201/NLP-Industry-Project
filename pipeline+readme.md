@@ -25,7 +25,7 @@ including exactly *how* each payload was hidden — is known.
 
 ---
 
-## The six hiding techniques
+## The eight hiding techniques
 
 Each technique targets a different gap between the visual layer and the text layer, and each
 requires a **different signal** to detect.
@@ -38,9 +38,13 @@ requires a **different signal** to detect.
 | `invisible_render_mode` | PDF text render mode 3 ("neither fill nor stroke") | The render-mode operator in the stream |
 | `transparent` | Fill alpha set to 0 | Opacity ~0 |
 | `offpage` | Positioned outside the visible page box | Coordinates outside the page bounds |
+| `bg_color_match` | Normal-size text colored to match an **arbitrary, non-white** page background; visible content around it uses a contrasting color | Low contrast vs the *actual* page background, not just vs white |
+| `bg_color_match_tiny` | Same background-matching color trick, plus a 1–3pt font | Low contrast vs actual background **and** tiny font — two stacked signals |
 
-The reason all six matter: a detector that only catches `white_on_white` misses the other five.
-`near_background` is the one that breaks naive detectors, since many only check for exact white.
+The reason all eight matter: a detector that only catches `white_on_white` misses the rest.
+`near_background` and `bg_color_match` are the ones that break naive detectors, since many only
+check for (near-)exact white — `bg_color_match` generalizes that gap to a colored page, which is
+also where a detector that hardcodes "background = white" when computing contrast will fail.
 
 ---
 
@@ -97,8 +101,10 @@ python pdf_injection_gen.py --out ./corpus --verify
 Expected tail of the output (each technique's payload is recoverable):
 
 ```
-generated 54 PDFs  (42 injected, 12 benign)
+generated 68 PDFs  (56 injected, 12 benign)
 extraction check (payload recovered by pdfplumber):
+  bg_color_match           7/7
+  bg_color_match_tiny      7/7
   invisible_render_mode    7/7
   near_background          7/7
   ...

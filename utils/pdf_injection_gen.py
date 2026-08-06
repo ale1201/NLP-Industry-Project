@@ -64,6 +64,30 @@ BENIGN_HIDDEN = [
 
 
 # --------------------------------------------------------------------------
+# Color helpers — for carrier documents with an arbitrary page background
+# (not just white). Shared by pdf_injection_gen.py and dataset_builder.py.
+# --------------------------------------------------------------------------
+def _luma(rgb):
+    r, g, b = rgb
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+def contrasting_text_color(bg):
+    """A readable fill color for normal (non-hidden) text against any bg."""
+    return (0.05, 0.05, 0.05) if _luma(bg) > 0.5 else (0.95, 0.95, 0.95)
+
+def blend(c1, c2, t):
+    """Linear blend from c1 towards c2 (t=0 -> c1, t=1 -> c2)."""
+    return tuple(a + (b - a) * t for a, b in zip(c1, c2))
+
+def random_bg_color():
+    """A page background color away from the extremes, so matching it is a
+    real color trick rather than degenerating into plain white/black."""
+    return (round(random.uniform(0.2, 0.85), 3),
+            round(random.uniform(0.2, 0.85), 3),
+            round(random.uniform(0.2, 0.85), 3))
+
+
+# --------------------------------------------------------------------------
 # 2. Base document — a plausible resume so visible content looks real.
 # --------------------------------------------------------------------------
 def draw_resume(c, name="Jordan Avery"):
@@ -154,6 +178,28 @@ def hide_offpage(c, text):
     c.drawString(x, y, text)
     return {"x": x, "y": y, "font_pt": 10.5, "color": "#000000", "opacity": 1.0, "render_mode": 0}
 
+def hide_bg_match(c, text, x=60, y=PAGE_H - 92, bg=(1, 1, 1), tiny=False):
+    """General form of white_on_white / near_background: fill color pulled to
+    within a hair of whatever the *page background* actually is (any color,
+    not just white). Optionally paired with a tiny font for a harder variant."""
+    jitter = lambda v: min(1.0, max(0.0, v + random.uniform(-0.006, 0.006)))
+    color = tuple(jitter(v) for v in bg)
+    size = round(random.uniform(1.0, 3.0), 1) if tiny else 10.5
+    c.setFillColorRGB(*color)
+    c.setFont("Helvetica", size)
+    c.drawString(x, y, text)
+    to_hex = lambda rgb: "#%02X%02X%02X" % tuple(int(round(v * 255)) for v in rgb)
+    return {"x": x, "y": y, "font_pt": size, "color": to_hex(color),
+            "bg_color": to_hex(bg), "opacity": 1.0, "render_mode": 0}
+
+def hide_bg_match_tiny(c, text, x=60, y=PAGE_H - 128, bg=(1, 1, 1)):
+    # y defaults to the same empty gap tiny_font uses (below the header lines),
+    # since a tiny font baseline landing inside a normal-size line's ascender
+    # zone makes pdfplumber's line reconstruction interleave the two — the
+    # text is still fully in the content stream, just no longer a clean
+    # contiguous string on naive extraction.
+    return hide_bg_match(c, text, x=x, y=y, bg=bg, tiny=True)
+
 TECHNIQUES = {
     "white_on_white": hide_white_on_white,
     "near_background": hide_near_background,
@@ -161,6 +207,8 @@ TECHNIQUES = {
     "invisible_render_mode": hide_invisible_render_mode,
     "transparent": hide_transparent,
     "offpage": hide_offpage,
+    "bg_color_match": hide_bg_match,
+    "bg_color_match_tiny": hide_bg_match_tiny,
 }
 
 

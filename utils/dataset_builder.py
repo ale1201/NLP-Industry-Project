@@ -19,7 +19,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
 
 # Reuse the validated hiding techniques + payload schema from the base generator.
-from pdf_injection_gen import TECHNIQUES, PAYLOADS, Payload, BENIGN_HIDDEN
+from pdf_injection_gen import (TECHNIQUES, PAYLOADS, Payload, BENIGN_HIDDEN,
+                               contrasting_text_color, random_bg_color, blend)
 
 PAGE_W, PAGE_H = letter
 
@@ -29,32 +30,44 @@ PAGE_W, PAGE_H = letter
 #    Variety here forces the detector to learn the hidden-text signal rather
 #    than memorizing one layout.
 # --------------------------------------------------------------------------
-def _section(c, title, lines, x, y, body_size=10.5):
-    c.setFillColorRGB(0.1, 0.1, 0.1); c.setFont("Helvetica-Bold", 12)
+def _fill_bg(c, bg):
+    """Paint the whole page bg. A no-op-looking white fill when bg is white,
+    so old (white-background) samples render byte-for-byte the same as before."""
+    c.setFillColorRGB(*bg)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
+
+def _section(c, title, lines, x, y, fg, sub, body_size=10.5):
+    c.setFillColorRGB(*fg); c.setFont("Helvetica-Bold", 12)
     c.drawString(x, y, title)
-    c.setFont("Helvetica", body_size); c.setFillColorRGB(0.27, 0.27, 0.27)
+    c.setFont("Helvetica", body_size); c.setFillColorRGB(*sub)
     for i, ln in enumerate(lines):
         c.drawString(x, y - 16 - i * 14, ln)
     return y - 16 - len(lines) * 14 - 16
 
-def tmpl_resume(c):
-    c.setFillColorRGB(0.1, 0.1, 0.1); c.setFont("Helvetica-Bold", 20)
+def tmpl_resume(c, bg=(1, 1, 1)):
+    _fill_bg(c, bg)
+    fg = contrasting_text_color(bg)
+    sub = blend(fg, bg, 0.3)
+    c.setFillColorRGB(*fg); c.setFont("Helvetica-Bold", 20)
     c.drawString(60, PAGE_H - 80, "Jordan Avery")
-    c.setFont("Helvetica", 11); c.setFillColorRGB(0.33, 0.33, 0.33)
+    c.setFont("Helvetica", 11); c.setFillColorRGB(*sub)
     c.drawString(60, PAGE_H - 100, "Senior Software Engineer \u2022 jordan.avery@email.com")
     y = PAGE_H - 140
     y = _section(c, "Experience", ["Backend Engineer, Acme Corp (2021\u20132024)",
-                                   "Built distributed services at scale."], 60, y)
-    _section(c, "Skills", ["Python, Go, Kubernetes, PostgreSQL"], 60, y)
+                                   "Built distributed services at scale."], 60, y, fg, sub)
+    _section(c, "Skills", ["Python, Go, Kubernetes, PostgreSQL"], 60, y, fg, sub)
 
-def tmpl_paper(c):
-    c.setFillColorRGB(0.1, 0.1, 0.1); c.setFont("Helvetica-Bold", 15)
+def tmpl_paper(c, bg=(1, 1, 1)):
+    _fill_bg(c, bg)
+    fg = contrasting_text_color(bg)
+    sub = blend(fg, bg, 0.3)
+    c.setFillColorRGB(*fg); c.setFont("Helvetica-Bold", 15)
     c.drawCentredString(PAGE_W/2, PAGE_H - 90, "Efficient Retrieval for Long-Context Models")
-    c.setFont("Helvetica-Oblique", 10); c.setFillColorRGB(0.4, 0.4, 0.4)
+    c.setFont("Helvetica-Oblique", 10); c.setFillColorRGB(*sub)
     c.drawCentredString(PAGE_W/2, PAGE_H - 110, "A. Researcher, B. Scholar   \u2014   Preprint")
-    c.setFont("Helvetica-Bold", 11); c.setFillColorRGB(0.1, 0.1, 0.1)
+    c.setFont("Helvetica-Bold", 11); c.setFillColorRGB(*fg)
     c.drawString(60, PAGE_H - 150, "Abstract")
-    c.setFont("Helvetica", 10); c.setFillColorRGB(0.27, 0.27, 0.27)
+    c.setFont("Helvetica", 10); c.setFillColorRGB(*sub)
     body = ("We present a method for retrieval-augmented generation that reduces "
             "latency while preserving answer quality across long documents. "
             "Experiments on standard benchmarks show consistent improvements.")
@@ -62,18 +75,23 @@ def tmpl_paper(c):
     for i, ln in enumerate(textwrap.wrap(body, 92)):
         c.drawString(60, PAGE_H - 170 - i * 14, ln)
 
-def tmpl_invoice(c):
-    c.setFillColorRGB(0.1, 0.1, 0.1); c.setFont("Helvetica-Bold", 18)
+def tmpl_invoice(c, bg=(1, 1, 1)):
+    _fill_bg(c, bg)
+    fg = contrasting_text_color(bg)
+    sub = blend(fg, bg, 0.3)
+    c.setFillColorRGB(*fg); c.setFont("Helvetica-Bold", 18)
     c.drawString(60, PAGE_H - 80, "INVOICE  #2041")
-    c.setFont("Helvetica", 10.5); c.setFillColorRGB(0.3, 0.3, 0.3)
+    c.setFont("Helvetica", 10.5); c.setFillColorRGB(*sub)
     c.drawString(60, PAGE_H - 105, "Bill to: Northwind Traders")
     c.drawString(60, PAGE_H - 120, "Date: 2026-07-15   Due: 2026-08-15")
     _section(c, "Line items", ["Consulting services .......... $4,200",
                                "Support retainer ............. $1,000",
-                               "Total ........................ $5,200"], 60, PAGE_H - 160)
+                               "Total ........................ $5,200"], 60, PAGE_H - 160, fg, sub)
 
-def tmpl_cover_letter(c):
-    c.setFont("Helvetica", 10.5); c.setFillColorRGB(0.2, 0.2, 0.2)
+def tmpl_cover_letter(c, bg=(1, 1, 1)):
+    _fill_bg(c, bg)
+    fg = contrasting_text_color(bg)
+    c.setFont("Helvetica", 10.5); c.setFillColorRGB(*fg)
     c.drawString(60, PAGE_H - 80, "Dear Hiring Manager,")
     import textwrap
     body = ("I am writing to express my interest in the Senior Engineer role. "
@@ -141,15 +159,18 @@ class Sample:
     hidden_text: str
     split: str = ""
 
-def build(path, template_fn, technique_fn, hidden_text, pos_xy):
+def build(path, template_fn, technique_fn, hidden_text, pos_xy, bg=(1, 1, 1)):
     c = canvas.Canvas(path, pagesize=letter)
-    template_fn(c)
+    template_fn(c, bg)
     if technique_fn is not None and hidden_text is not None:
-        # techniques that accept coords use them; offpage ignores and self-places
+        # try richest signature first: (x, y, bg) -> (x, y) -> bare (offpage self-places)
         try:
-            technique_fn(c, hidden_text, x=pos_xy[0], y=pos_xy[1])
+            technique_fn(c, hidden_text, x=pos_xy[0], y=pos_xy[1], bg=bg)
         except TypeError:
-            technique_fn(c, hidden_text)
+            try:
+                technique_fn(c, hidden_text, x=pos_xy[0], y=pos_xy[1])
+            except TypeError:
+                technique_fn(c, hidden_text)
     c.showPage(); c.save()
 
 
@@ -166,6 +187,13 @@ def make_dataset(out_dir, n_positive, neg_ratio, payload_file, seed):
 
     samples = []
 
+    # techniques that hide text by matching an arbitrary page background need
+    # that background to actually be colored; every other technique keeps the
+    # plain white page it was designed against.
+    bg_matching_techs = {"bg_color_match", "bg_color_match_tiny"}
+    def pick_bg(tech):
+        return random_bg_color() if tech in bg_matching_techs else (1, 1, 1)
+
     # ---- positives: sample (template, payload, technique, placement) ----
     for i in range(n_positive):
         tmpl = random.choice(tmpl_names)
@@ -174,13 +202,14 @@ def make_dataset(out_dir, n_positive, neg_ratio, payload_file, seed):
         place = random.choice(place_names)
         fn = f"pos_{i:05d}.pdf"
         build(os.path.join(pdf_dir, fn), TEMPLATES[tmpl], TECHNIQUES[tech],
-              pl.text, PLACEMENTS[place])
+              pl.text, PLACEMENTS[place], bg=pick_bg(tech))
         samples.append(Sample(fn, 1, tmpl, tech, place, pl.id, pl.category,
                               pl.severity, pl.explicit, pl.text))
 
     # ---- negatives: mix of clean, hard (benign hidden), near-miss ----
     n_negative = n_positive * neg_ratio
-    hard_techs = ["white_on_white", "tiny_font", "invisible_render_mode"]
+    hard_techs = ["white_on_white", "tiny_font", "invisible_render_mode",
+                  "bg_color_match", "bg_color_match_tiny"]
     near_miss_visible = [
         "Please review my qualifications carefully and consider me a strong fit.",
         "I believe I am the ideal candidate for this position.",
@@ -195,7 +224,8 @@ def make_dataset(out_dir, n_positive, neg_ratio, payload_file, seed):
         elif r < 0.85:                      # hard negative: benign hidden text
             tech = random.choice(hard_techs); place = random.choice(place_names)
             txt = random.choice(BENIGN_HIDDEN)
-            build(os.path.join(pdf_dir, fn), TEMPLATES[tmpl], TECHNIQUES[tech], txt, PLACEMENTS[place])
+            build(os.path.join(pdf_dir, fn), TEMPLATES[tmpl], TECHNIQUES[tech], txt, PLACEMENTS[place],
+                  bg=pick_bg(tech))
             samples.append(Sample(fn, 0, tmpl, tech, place, "none", "benign_hidden", "n/a", False, txt))
         else:                               # near-miss: injection-like but VISIBLE
             def draw_visible(c, text, x=60, y=PAGE_H-260):

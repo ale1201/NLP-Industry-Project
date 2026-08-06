@@ -27,7 +27,7 @@ the generator wrote the hidden text itself, so it knows exactly what's hidden, h
 
 ---
 
-## 2. The six hiding techniques
+## 2. The eight hiding techniques
 
 Each is a small function that takes a `reportlab` canvas and a string, and returns a
 `placement` dict describing what it did (this dict becomes ground truth):
@@ -40,10 +40,19 @@ Each is a small function that takes a `reportlab` canvas and a string, and retur
 | `invisible_render_mode` | `hide_invisible_render_mode` | PDF text render mode `3` ("neither fill nor stroke"), set via `beginText()` / `setTextRenderMode(3)` |
 | `transparent` | `hide_transparent` | `setFillAlpha(0.0)` — zero opacity |
 | `offpage` | `hide_offpage` | Drawn at `y = -40`, outside the visible page box |
+| `bg_color_match` | `hide_bg_match` | Fill color pulled to within a hair of the *actual page background color* — any color, not just white — at normal (10.5pt) font size |
+| `bg_color_match_tiny` | `hide_bg_match_tiny` | Same background-color match, stacked with a random 1–3pt font |
 
-All six write real text objects into the content stream — none of them rasterize the
+All eight write real text objects into the content stream — none of them rasterize the
 text into an image. That's what makes the corpus useful: a naive extractor pulls the
 string regardless of technique, while a human sees a clean page.
+
+`white_on_white` / `near_background` are the fixed-page-color special case; `bg_color_match`
+generalizes the same trick to a page background of any color, which also means the visible
+(non-hidden) text on that page has to be drawn in a *contrasting* color to stay legible — see
+§4a below. This matters for evaluating a detector: a contrast check that's hardcoded against a
+white background (as `detector.py`'s currently is) will misjudge *every* character on a
+colored page, not just the injected ones.
 
 ---
 
@@ -80,6 +89,14 @@ Instead of always drawing a résumé, `TEMPLATES` holds four generators: `resume
 `paper` (academic abstract), `invoice`, `cover_letter`. A random template is picked per
 sample so a detector can't shortcut by memorizing one document layout.
 
+Every template now takes a `bg` color (default white, so old callers are unaffected). It
+fills the whole page with `bg` via a full-page `rect(..., fill=1)`, then picks the
+*visible* text color with `contrasting_text_color(bg)` — near-black on a light background,
+near-white on a dark one — so ordinary content stays legible regardless of page color. The
+`bg_color_match*` techniques then draw the *hidden* string in a color pulled to within a
+hair of that same `bg`, so it visually disappears into the page while the surrounding text
+reads normally.
+
 ### b) External payload pools
 `load_payloads()` reads a JSON file of `{id, text, category, severity, explicit}`
 objects (`--payloads payloads_example.json`), so you can swap in a public injection
@@ -97,8 +114,9 @@ Rather than a full cross-product, `make_dataset()` **samples**:
 - **Negatives** (`n_positive * --neg-ratio`, default ratio 4): each is one of three
   kinds, chosen by weighted random roll:
   - **55% clean** — carrier document, nothing hidden
-  - **30% hard negative** — benign string from `BENIGN_HIDDEN`, hidden with a hard
-    technique (same idea as the base generator)
+  - **30% hard negative** — benign string from `BENIGN_HIDDEN`, hidden with one of the
+    five hard techniques (`white_on_white`, `tiny_font`, `invisible_render_mode`,
+    `bg_color_match`, `bg_color_match_tiny` — same idea as the base generator)
   - **15% near-miss visible** — injection-*sounding* phrasing
     (e.g. *"I believe I am the ideal candidate..."*) drawn **fully visible**, testing
     that the detector isn't just pattern-matching phrasing regardless of visibility
@@ -144,12 +162,16 @@ overall/per-split, positives-per-technique, negatives-per-type, and the leakage 
 
 ```bash
 python pdf_injection_gen.py --out ./corpus --verify
-# 54 PDFs (42 injected, 12 benign) — all 6 techniques 7/7 recoverable
+# 68 PDFs (56 injected, 12 benign) — all 8 techniques 7/7 recoverable
 
 python dataset_builder.py --out ./dataset_run \
   --n-positive 400 --neg-ratio 4 --payloads payloads_example.json --seed 13
 # 2000 PDFs — train 1204 / val 383 / test 413 — 0 leakage groups across splits
 ```
+
+(the 2000-PDF split counts above predate the two `bg_color_match*` techniques and were not
+re-run — re-running with the same seed will pick different technique/placement draws, since
+`TECHNIQUES` is now a longer list, but the split sizes and leakage guarantee are unaffected)
 
 ---
 
