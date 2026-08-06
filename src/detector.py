@@ -6,7 +6,9 @@ hidden text is instruction-like. Scores itself against a dataset manifest and
 reports precision/recall broken down by hiding technique and by negative type.
 
 Signals
-  char-level (pdfplumber):     low contrast vs background, tiny font, off-page position
+  char-level (pdfplumber):     low contrast vs the actual page background (detected per page
+                                from the largest full-page fill rect, not assumed white),
+                                tiny font, off-page position
   content-stream (pikepdf):    text render mode 3 (invisible), fill alpha ~0 (transparent)
   semantic (regex):            instruction-like phrasing in the recovered hidden text
 
@@ -63,6 +65,26 @@ def contrast_ratio(rgb, bg=(1, 1, 1)):
     hi, lo = max(l1, l2), min(l1, l2)
     return (hi + 0.05) / (lo + 0.05)
 
+def page_bg_color(page):
+    """Best-effort actual page background: the fill color of the largest rect
+    that covers (nearly) the whole page. Falls back to white when no such rect
+    exists, which is the common case for plain text-only PDFs and keeps this
+    change a no-op for pages that were already scored correctly."""
+    W, H = page.width, page.height
+    best, best_area = None, 0.0
+    for r in page.rects:
+        if not r.get("fill"):
+            continue
+        if r["width"] < W * 0.9 or r["height"] < H * 0.9:
+            continue
+        rgb = normalize_color(r.get("non_stroking_color"))
+        if rgb is None:
+            continue
+        area = r["width"] * r["height"]
+        if area > best_area:
+            best, best_area = rgb, area
+    return best if best is not None else (1, 1, 1)
+
 
 # --------------------------------------------------------------------------
 # Semantic pass
@@ -101,13 +123,13 @@ def looks_like_injection(text):
 # --------------------------------------------------------------------------
 # Char-level scan (contrast / tiny font / off-page)
 # --------------------------------------------------------------------------
-def scan_chars(page):
+def scan_chars(page, bg=(1, 1, 1)):
     findings = []
     W, H = page.width, page.height
     for ch in page.chars:
         sigs = []
         rgb = normalize_color(ch.get("non_stroking_color"))
-        if rgb is not None and contrast_ratio(rgb) < CONTRAST_MIN:
+        if rgb is not None and contrast_ratio(rgb, bg) < CONTRAST_MIN:
             sigs.append("low_contrast")
         if ch.get("size", 99) < TINY_PT:
             sigs.append("tiny_font")
@@ -190,10 +212,12 @@ def scan_stream(pdf_page):
 # Top-level scan of one PDF
 # --------------------------------------------------------------------------
 def scan_pdf(path):
-    signals, hidden_parts = set(), []
+    signals, hidden_parts, page_bgs = set(), [], []
     with pdfplumber.open(path) as pdf:
         for page in pdf.pages:
-            s, t = scan_chars(page)
+            bg = page_bg_color(page)
+            page_bgs.append("#%02X%02X%02X" % tuple(round(v * 255) for v in bg))
+            s, t = scan_chars(page, bg)
             signals |= set(s)
             if t.strip(): hidden_parts.append(t)
     with pikepdf.open(path) as pdf:
@@ -211,6 +235,7 @@ def scan_pdf(path):
         "has_hidden": bool(signals),
         "injection_like": inj_like,
         "injection_hits": inj_hits,
+        "page_bg": page_bgs,
     }
 
 def decide(result, mode):
