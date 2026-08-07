@@ -364,6 +364,43 @@ most "generic" signal is both the most useful structurally and the least able to
 tell malicious from benign on its own, which is exactly why §5.1's semantic filter
 is necessary rather than optional.
 
+## 5d. Classifier comparison — TF-IDF + {Logistic Regression, Linear SVM, Naive Bayes}
+
+Everything so far used TF-IDF + logistic regression as the semantic classifier.
+Tested whether the *algorithm* choice matters as much as the *training data* choice
+did in §5b, by swapping in two more classifiers on the exact same features and the
+exact same training corpus (synthetic + real `deepset`, 1,294 rows) — isolating
+algorithm from data. Built as two standalone scripts,
+`src/train_semantic_svm.py` and `src/train_semantic_nb.py` (`results/classifier_comparison.json`):
+
+| classifier | `deepset` real test (text only) | `dataset_check` (PDF, known vocab) | `dataset_holdout` (PDF, new vocab) |
+|---|---|---|---|
+| logistic regression (existing) | F1 0.841 | F1 1.000 | F1 0.929 |
+| **linear SVM** | **F1 0.852** | F1 1.000 | F1 0.929 |
+| multinomial Naive Bayes | F1 0.722 | F1 1.000 | F1 0.857 |
+
+Linear SVM ties or slightly edges out logistic regression everywhere — a real but
+mild difference given the eval set sizes (116 and 300 rows), not the kind of swing
+that would justify switching the default. Naive Bayes is clearly the weaker choice:
+precision holds (never below 0.94) but recall drops on both real text (0.583) and
+new vocabulary (0.750) — it's more conservative, missing more true positives than
+either discriminative model. A likely explanation: injection cues are often
+multi-word phrases (bigrams like "ignore previous", "match score"), and NB's
+independence assumption treats their joint occurrence as separate evidence rather
+than a correlated signal, which should specifically hurt a bigram-heavy feature
+space like this one.
+
+All three tie at a perfect F1 1.000 on `dataset_check` — expected, since that PDF
+corpus reuses training-family vocabulary and isn't a discriminating test for
+algorithm choice, only for training-data choice (§5b already covered that ground).
+
+**Takeaway carried forward:** algorithm choice matters far less here than training
+data did — §5b's synthetic-vs-real-vs-combined comparison swung F1 by 0.45+, while
+the best-vs-worst classifier gap here is 0.13. Given no meaningful edge, logistic
+regression remains the default in `model_hybrid_combined.py`; linear SVM would be
+a reasonable drop-in if a future change wanted marginally more real-world recall,
+but Naive Bayes is not recommended for this task.
+
 ## 6. Key takeaways
 
 1. **Visual-hiding detection works well structurally** — every technique tested,

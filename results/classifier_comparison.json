@@ -1,0 +1,23 @@
+{
+  "context": "Same TF-IDF (unigram+bigram) features and same training corpus (synthetic build_corpus() + real deepset_train.csv, 1294 rows) across all three -- only the classifier on top changes. Isolates algorithm choice from feature/data choice.",
+  "text_classification_deepset_test": {
+    "description": "116-row official deepset/prompt-injections test split, text classification only (no PDF/structural layer)",
+    "logreg": {"precision": 0.957, "recall": 0.750, "f1": 0.841},
+    "svm_linear": {"precision": 0.958, "recall": 0.767, "f1": 0.852},
+    "naive_bayes": {"precision": 0.946, "recall": 0.583, "f1": 0.722}
+  },
+  "full_hybrid_detector_dataset_check_test": {
+    "description": "410 PDFs, 63 positive, known/training-family vocabulary -- structural gate + this semantic model",
+    "logreg": {"precision": 1.0, "recall": 1.0, "f1": 1.0},
+    "svm_linear": {"precision": 1.0, "recall": 1.0, "f1": 1.0},
+    "naive_bayes": {"precision": 1.0, "recall": 1.0, "f1": 1.0}
+  },
+  "full_hybrid_detector_dataset_holdout_all": {
+    "description": "300 PDFs, 60 positive, 12 payloads in genuinely new vocabulary -- structural gate + this semantic model",
+    "logreg": {"precision": 1.0, "recall": 0.867, "f1": 0.929},
+    "svm_linear": {"precision": 1.0, "recall": 0.867, "f1": 0.929},
+    "naive_bayes": {"precision": 1.0, "recall": 0.750, "f1": 0.857}
+  },
+  "finding": "Linear SVM ties or slightly beats logistic regression everywhere (F1 0.852 vs 0.841 on real text; identical elsewhere) -- a mild edge, not a meaningful difference given the eval sizes involved (116 and 300 rows). Naive Bayes is clearly weaker: it holds precision (never drops below 0.94) but recall suffers on both the real-world test (0.583) and the new-vocabulary holdout (0.750) -- it is more conservative, missing more true positives than either discriminative model. All three tie on our own PDF corpus (dataset_check), which reuses training-family vocabulary and is not a discriminating test for algorithm choice.",
+  "conclusion": "Algorithm choice (LogReg vs linear SVM) matters much less than training-data choice did in report.md §5b (synthetic-only vs real-only vs combined swung F1 by 0.45+). Naive Bayes's independence assumption appears to cost real recall on this task, likely because injection cues are often multi-word phrases (bigrams like 'ignore previous', 'match score') whose joint occurrence NB treats as independent evidence rather than a correlated signal. Linear SVM is a reasonable drop-in alternative to logistic regression; Naive Bayes is not recommended for this task."
+}
