@@ -1,0 +1,24 @@
+{
+  "note": "Scored against manifest_val.csv for both datasets, not manifest_test.csv -- both datasets' test splits have 0 positives (group-aware split starved by too few payload groups: 7 built-in payloads for dataset_check, 12 for dataset_holdout_check). See 'known_issue' below.",
+  "dataset_check": {
+    "description": "2000 PDFs, rebuilt with the 2 new bg-color-matching techniques (bg_color_match, bg_color_match_tiny) and background-aware contrast in detector.py. Uses the 7 built-in PAYLOADS -- same vocabulary the synthetic semantic model was trained on.",
+    "val_split": {"n": 415, "pos": 76, "neg": 339},
+    "structural": {"precision": 0.369, "recall": 1.0, "f1": 0.539,
+      "note": "All 8 techniques recovered at 100% recall, including both new bg-color techniques -- confirms the new hiding tricks and the background-aware detector fix both work."},
+    "combined_synthetic_model": {"precision": 1.0, "recall": 1.0, "f1": 1.0,
+      "note": "Perfect score, as expected -- same 7 payloads the model was trained on."},
+    "combined_real_trained_model": {"precision": 0.0, "recall": 0.0, "f1": 0.0,
+      "note": "Total failure -- recognizes 0/76. Confirms again that the deepset-trained model's vocabulary doesn't overlap with this repo's hand-written PAYLOADS phrasing at all."}
+  },
+  "dataset_holdout_check": {
+    "description": "300 PDFs, 12 NEW payloads (utils/payloads_holdout.json) written to share no words with dataset_check's payloads -- built specifically to test whether the semantic classifier generalizes past its known phrase list.",
+    "val_split": {"n": 102, "pos": 16, "neg": 86},
+    "structural": {"precision": 1.0, "recall": 1.0, "f1": 1.0},
+    "combined_synthetic_model": {"precision": 1.0, "recall": 1.0, "f1": 1.0,
+      "note": "Unexpectedly perfect. Despite zero word overlap, the 12 holdout payloads follow the SAME functional categories as the synthetic training corpus (instruction-override, authority-spoof, eval-manipulation, data-injection) and reuse similar function words (ignore/disregard/cancel, SYSTEM/ATTENTION, 'the assistant/model/grader'). TF-IDF bigrams pick up on those shared functional patterns even with different content words."},
+    "combined_real_trained_model": {"precision": 1.0, "recall": 0.75, "f1": 0.857,
+      "note": "Worse than the synthetic model here, despite being trained on more real-world data overall. deepset/prompt-injections' examples are mostly general chatbot questions in a different register (multilingual, casual) -- not this repo's resume/paper-screening injection genre -- so it has less overlap with THIS holdout set's style than the synthetic corpus does."}
+  },
+  "known_issue_for_team": "Both dataset_check and dataset_holdout_check have 0 positives in manifest_test.csv, because group-aware splitting (payload id -> split) starves small payload pools (7 and 12 groups respectively) exactly as documented in pipeline+readme.md's troubleshooting table. Fix: build with a larger --payloads pool (e.g. payloads_example.json, 50 payloads) so test gets positives, same fix already applied to utils/dataset_run/ in this repo.",
+  "key_takeaway": "Neither 'more real training data' nor 'trained on the exact target vocabulary' alone guarantees generalization -- what matters is whether the training distribution's GENRE/register matches the target's. The synthetic model (narrow vocabulary, but same genre as the holdout) outperformed the real-data model (broad vocabulary, different genre) on this specific holdout set, the reverse of the earlier deepset-test-set result in results/semantic_model_comparison.json where the real-trained model won. Neither model is universally 'the good one' -- it depends on matching the deployment domain."
+}

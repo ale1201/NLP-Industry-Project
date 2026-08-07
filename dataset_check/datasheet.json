@@ -23,7 +23,7 @@
     "mid",
     "footer"
   ],
-  "n_payloads": 7,
+  "n_payloads": 50,
   "overall": {
     "n": 2000,
     "pos": 400,
@@ -32,37 +32,37 @@
   },
   "splits": {
     "train": {
-      "n": 1234,
-      "pos": 324,
-      "neg": 910,
-      "pos_rate": 0.263
+      "n": 1193,
+      "pos": 282,
+      "neg": 911,
+      "pos_rate": 0.236
     },
     "val": {
-      "n": 415,
-      "pos": 76,
-      "neg": 339,
-      "pos_rate": 0.183
+      "n": 397,
+      "pos": 55,
+      "neg": 342,
+      "pos_rate": 0.139
     },
     "test": {
-      "n": 351,
-      "pos": 0,
-      "neg": 351,
-      "pos_rate": 0.0
+      "n": 410,
+      "pos": 63,
+      "neg": 347,
+      "pos_rate": 0.154
     }
   },
   "positives_by_technique": {
-    "white_on_white": 52,
-    "near_background": 48,
-    "tiny_font": 53,
-    "invisible_render_mode": 39,
-    "transparent": 51,
-    "offpage": 50,
-    "bg_color_match": 56,
-    "bg_color_match_tiny": 51
+    "white_on_white": 55,
+    "near_background": 39,
+    "tiny_font": 55,
+    "invisible_render_mode": 42,
+    "transparent": 50,
+    "offpage": 48,
+    "bg_color_match": 58,
+    "bg_color_match_tiny": 53
   },
   "negatives_by_type": {
-    "clean": 892,
-    "benign_hidden": 479,
-    "near_miss": 229
+    "clean": 888,
+    "benign_hidden": 480,
+    "near_miss": 232
   }
 }

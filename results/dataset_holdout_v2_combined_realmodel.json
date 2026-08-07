@@ -1,0 +1,25 @@
+{
+  "mode": "combined",
+  "tp": 48,
+  "fp": 18,
+  "tn": 222,
+  "fn": 12,
+  "precision": 0.727,
+  "recall": 0.8,
+  "f1": 0.762,
+  "recall_by_technique": {
+    "bg_color_match": "2/2",
+    "bg_color_match_tiny": "11/12",
+    "invisible_render_mode": "2/4",
+    "near_background": "5/8",
+    "offpage": "3/3",
+    "tiny_font": "9/12",
+    "transparent": "10/11",
+    "white_on_white": "6/8"
+  },
+  "false_positive_by_negtype": {
+    "benign_hidden": "18/63",
+    "clean": "0/147",
+    "near_miss": "0/30"
+  }
+}

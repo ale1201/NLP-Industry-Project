@@ -1,0 +1,36 @@
+/usr/local/anaconda3/envs/nlp-pdf-injection/lib/python3.11/site-packages/sklearn/base.py:525: InconsistentVersionWarning: Trying to unpickle estimator TfidfTransformer from version 1.6.1 when using version 1.9.0. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
+https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations
+  warnings.warn(
+/usr/local/anaconda3/envs/nlp-pdf-injection/lib/python3.11/site-packages/sklearn/base.py:525: InconsistentVersionWarning: Trying to unpickle estimator TfidfVectorizer from version 1.6.1 when using version 1.9.0. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
+https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations
+  warnings.warn(
+/usr/local/anaconda3/envs/nlp-pdf-injection/lib/python3.11/site-packages/sklearn/base.py:525: InconsistentVersionWarning: Trying to unpickle estimator LogisticRegression from version 1.6.1 when using version 1.9.0. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
+https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations
+  warnings.warn(
+/usr/local/anaconda3/envs/nlp-pdf-injection/lib/python3.11/site-packages/sklearn/base.py:525: InconsistentVersionWarning: Trying to unpickle estimator Pipeline from version 1.6.1 when using version 1.9.0. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
+https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations
+  warnings.warn(
+{
+  "mode": "combined",
+  "tp": 76,
+  "fp": 0,
+  "tn": 339,
+  "fn": 0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "recall_by_technique": {
+    "bg_color_match": "14/14",
+    "bg_color_match_tiny": "6/6",
+    "invisible_render_mode": "13/13",
+    "near_background": "10/10",
+    "offpage": "4/4",
+    "tiny_font": "15/15",
+    "transparent": "7/7",
+    "white_on_white": "7/7"
+  },
+  "false_positive_by_negtype": {
+    "benign_hidden": "0/130",
+    "clean": "0/209"
+  }
+}

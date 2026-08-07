@@ -1,0 +1,129 @@
+{
+  "manifest": "../dataset_check/manifest_all.csv",
+  "n_positive": 400,
+  "n_negative": 1600,
+  "baseline_recall_by_technique_all_signals": {
+    "bg_color_match": 1.0,
+    "bg_color_match_tiny": 1.0,
+    "invisible_render_mode": 1.0,
+    "near_background": 1.0,
+    "offpage": 1.0,
+    "tiny_font": 1.0,
+    "transparent": 1.0,
+    "white_on_white": 1.0
+  },
+  "leave_one_out_recall": {
+    "description": "recall per technique with the named signal REMOVED (other 4 kept)",
+    "low_contrast": {
+      "bg_color_match": 0.0,
+      "bg_color_match_tiny": 1.0,
+      "invisible_render_mode": 1.0,
+      "near_background": 0.0,
+      "offpage": 1.0,
+      "tiny_font": 1.0,
+      "transparent": 1.0,
+      "white_on_white": 0.0
+    },
+    "tiny_font": {
+      "bg_color_match": 1.0,
+      "bg_color_match_tiny": 1.0,
+      "invisible_render_mode": 1.0,
+      "near_background": 1.0,
+      "offpage": 1.0,
+      "tiny_font": 0.0,
+      "transparent": 1.0,
+      "white_on_white": 1.0
+    },
+    "off_page": {
+      "bg_color_match": 1.0,
+      "bg_color_match_tiny": 1.0,
+      "invisible_render_mode": 1.0,
+      "near_background": 1.0,
+      "offpage": 0.0,
+      "tiny_font": 1.0,
+      "transparent": 1.0,
+      "white_on_white": 1.0
+    },
+    "render_mode_3": {
+      "bg_color_match": 1.0,
+      "bg_color_match_tiny": 1.0,
+      "invisible_render_mode": 0.0,
+      "near_background": 1.0,
+      "offpage": 1.0,
+      "tiny_font": 1.0,
+      "transparent": 1.0,
+      "white_on_white": 1.0
+    },
+    "transparent": {
+      "bg_color_match": 1.0,
+      "bg_color_match_tiny": 1.0,
+      "invisible_render_mode": 1.0,
+      "near_background": 1.0,
+      "offpage": 1.0,
+      "tiny_font": 1.0,
+      "transparent": 0.0,
+      "white_on_white": 1.0
+    }
+  },
+  "keep_only_one_recall": {
+    "description": "recall per technique using ONLY the named signal (other 4 ignored)",
+    "low_contrast": {
+      "bg_color_match": 1.0,
+      "bg_color_match_tiny": 1.0,
+      "invisible_render_mode": 0.0,
+      "near_background": 1.0,
+      "offpage": 0.0,
+      "tiny_font": 0.0,
+      "transparent": 0.0,
+      "white_on_white": 1.0
+    },
+    "tiny_font": {
+      "bg_color_match": 0.0,
+      "bg_color_match_tiny": 1.0,
+      "invisible_render_mode": 0.0,
+      "near_background": 0.0,
+      "offpage": 0.0,
+      "tiny_font": 1.0,
+      "transparent": 0.0,
+      "white_on_white": 0.0
+    },
+    "off_page": {
+      "bg_color_match": 0.0,
+      "bg_color_match_tiny": 0.0,
+      "invisible_render_mode": 0.0,
+      "near_background": 0.0,
+      "offpage": 1.0,
+      "tiny_font": 0.0,
+      "transparent": 0.0,
+      "white_on_white": 0.0
+    },
+    "render_mode_3": {
+      "bg_color_match": 0.0,
+      "bg_color_match_tiny": 0.0,
+      "invisible_render_mode": 1.0,
+      "near_background": 0.0,
+      "offpage": 0.0,
+      "tiny_font": 0.0,
+      "transparent": 0.0,
+      "white_on_white": 0.0
+    },
+    "transparent": {
+      "bg_color_match": 0.0,
+      "bg_color_match_tiny": 0.0,
+      "invisible_render_mode": 0.0,
+      "near_background": 0.0,
+      "offpage": 0.0,
+      "tiny_font": 0.0,
+      "transparent": 1.0,
+      "white_on_white": 0.0
+    }
+  },
+  "benign_hidden_false_positive_rate_leave_one_out": {
+    "benign_hidden_baseline_fp_rate": 1.0,
+    "remove_low_contrast": 0.619,
+    "remove_tiny_font": 0.777,
+    "remove_off_page": 1.0,
+    "remove_render_mode_3": 0.802,
+    "remove_transparent": 1.0
+  }
+}

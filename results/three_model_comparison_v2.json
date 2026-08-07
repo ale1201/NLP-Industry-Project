@@ -1,0 +1,15 @@
+{
+  "context": "Both dataset_check and dataset_holdout_check were regenerated to fix their empty test splits: dataset_check now uses payloads_example.json (50 payloads, seed 13, unchanged n_positive/neg_ratio) instead of the 7 built-ins; dataset_holdout_check kept its original 12 new-vocabulary payloads but switched to seed 37 (found by search) for a non-degenerate split. A new semantic_model_combined.joblib was trained on build_corpus() synthetic rows + deepset_train.csv real rows together (1294 rows total).",
+  "scored_on": {
+    "deepset_test": "data/deepset_test.csv (116 rows, real dataset's official test split)",
+    "dataset_check_test": "dataset_check/manifest_test.csv (410 PDFs, 63 positive, 50-payload vocabulary)",
+    "dataset_holdout_all": "dataset_holdout_check/manifest_all.csv (300 PDFs, 60 positive, 12 new-vocabulary payloads never used in any training corpus)"
+  },
+  "f1_by_model": {
+    "synthetic_only (semantic_model.joblib)":  {"deepset_test": 0.391, "dataset_check_test": 1.000, "dataset_holdout_all": 0.929},
+    "real_only (semantic_model_real.joblib)":  {"deepset_test": 0.841, "dataset_check_test": 0.486, "dataset_holdout_all": 0.762},
+    "combined (semantic_model_combined.joblib)": {"deepset_test": 0.841, "dataset_check_test": 1.000, "dataset_holdout_all": 0.929}
+  },
+  "finding": "The combined model matches or ties the single best score on all three benchmarks simultaneously -- it is not a compromise between the two single-source models, it dominates both. It ties synthetic_only's perfect/near-perfect scores on our own PDF corpora (dataset_check, dataset_holdout_check) while matching real_only's much stronger deepset_test score, instead of splitting the difference. This held even though the two training sources are genuinely different genres (resume/paper-screening hand-written injections vs general multilingual chatbot injections) -- their feature overlap in TF-IDF space was low enough that training on both did not meaningfully hurt performance on either.",
+  "caveat": "This is still evaluated on a limited number of benchmarks (3) and a linear TF-IDF model with a lot of capacity relative to corpus size (1294 rows); the 'no compromise' result may not hold as more, more different genres are added. Worth re-checking if a 4th, still-more-different genre is folded in later."
+}

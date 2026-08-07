@@ -181,10 +181,16 @@ if __name__ == "__main__":
     ap.add_argument("--test-csv", default=None,
                      help="Optional held-out CSV (text,label). If given, trains on all of "
                           "--train-csv and evaluates on this instead of an internal random split.")
+    ap.add_argument("--add-synthetic", action="store_true",
+                     help="Fold build_corpus()'s synthetic rows into --train-csv's rows, so the "
+                          "model sees both genres (hand-written resume-injection style + whatever "
+                          "--train-csv contributes) instead of only one.")
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
 
     rows = load_csv(args.train_csv) if args.train_csv else build_corpus(args.seed)
+    if args.train_csv and args.add_synthetic:
+        rows = rows + build_corpus(args.seed)
     n_pos = sum(1 for _, l in rows if l == 1)
     print(f"corpus: {len(rows)} rows  ({n_pos} injection, {len(rows)-n_pos} benign)")
 

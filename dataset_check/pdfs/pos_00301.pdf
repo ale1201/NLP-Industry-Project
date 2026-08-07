@@ -1,4 +1,4 @@
-%PDF-1.4
+%PDF-1.3
 %“Œ‹ž ReportLab Generated PDF document (opensource)
 1 0 obj
 <<
@@ -13,11 +13,7 @@ endobj
 3 0 obj
 <<
 /Contents 7 0 R /MediaBox [ 0 0 612 792 ] /Parent 6 0 R /Resources <<
-/ExtGState <<
-/gRLs0 <<
-/ca 0
->>
->> /Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
 >> /Rotate 0 /Trans <<
 
 >> 
@@ -31,7 +27,7 @@ endobj
 endobj
 5 0 obj
 <<
-/Author (anonymous) /CreationDate (D:20260806212119+02'00') /Creator (anonymous) /Keywords () /ModDate (D:20260806212119+02'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+/Author (anonymous) /CreationDate (D:20260807113641+02'00') /Creator (anonymous) /Keywords () /ModDate (D:20260807113641+02'00') /Producer (ReportLab PDF Library - \(opensource\)) 
   /Subject (unspecified) /Title (untitled) /Trapped /False
 >>
 endobj
@@ -42,10 +38,10 @@ endobj
 endobj
 7 0 obj
 <<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 470
+/Filter [ /ASCII85Decode /FlateDecode ] /Length 482
 >>
 stream
-Garo=d;GI.&4PLPMYl$o.=kK,S&\K&eZD_LD>4-AAo5"be$7#<s1SR\;Gmg([RU$5`cH'T6<:XeH2p,e\Gfa-gn?a&]ZG*=4Q*rqjHD,QR9ubt#kk_h0]@8E]g,"m/_D\ZT<Z&-n?N35@JS]_0!Lt[%!_N'']Y*]k7,-SY70sO"e&e30'@_sL$B1!FFY9K@[C[V"jl.h.7O_Y31ib,,R'>W4Hao>EUSnY6jsPgjnSg#ja93@O`mO#7lY>ZXnPIqX.BS[F_I'>9tit=2+/jlU35KE2b^n`D,46;cIhm5EgVe+VhB;TM2%DXJ5_j3%O^Oa(heB=G3<V2=BjlEc*Q]n'>&E[P]'IMm7KN&J`K8_D+gpX]h#mBmZbb_(it-Prf^WWT+A2WM-7)[CQ]X!s-I_&X;SXkA/'6GjZKs;1fPF4bh5$(Z!gc$Zn=rrUP*]Qd$3*<VKq[_U]/>rr<%F'^nq~>endstream
+Garo>:QNsY&B4,:'^l=.@cHNWQQ(`)MHFk3/f\/0R[?h9aEG#QgG;E*Bc!b+&rkoHq9@,&M1ct]I!#sIWUTGIK\W4]6"V<.ob4rP-1V+H.j[TOD;^nK?''XOb=DOt3'F?\E$FiVhh^9H-TQ&t_ji-Y_F9&s<pT;D.k-PJ`Z*[j8QjT*?b],(#M$_>a'5Lp?D'G\O0^cbVP41k*B]%+IY+he30"t$[Y+`cj#hLn0p]nu]8d#C]l5qQ%uO;$d]+Y\n*:bNU>)[a6:Wnn8jANA&P;WrMPJOe@GhepSPdFfen@e,IYb+MA((ot7$p<:4p^LpG%4V69V$>ic#qfCc7^4(<`r.<YM.[nc#J[fmS`l@KfU'*\>&6e8Fs,h;L^Z5.uV_9R-@U+Y<\Oodq&uo,i_Ti[k^a_IP/VJ\bIf*c.2Rg3_1m"r'")lVb\.7BCpjsW)]X>NUU`gS4:gln-I_]qdl8KX^Ul5L7,U\~>endstream
 endobj
 xref
 0 8
@@ -53,14 +49,14 @@ xref
 0000000061 00000 n 
 0000000092 00000 n 
 0000000199 00000 n 
-0000000428 00000 n 
-0000000496 00000 n 
-0000000757 00000 n 
-0000000816 00000 n 
+0000000392 00000 n 
+0000000460 00000 n 
+0000000721 00000 n 
+0000000780 00000 n 
 trailer
 <<
 /ID 
-[<3b65f71eddef85cf91cb1652fa6e9a83><3b65f71eddef85cf91cb1652fa6e9a83>]
+[<39ab0d45557917a9b699c4d296c8ebe4><39ab0d45557917a9b699c4d296c8ebe4>]
 % ReportLab generated PDF document -- digest (opensource)
 
 /Info 5 0 R
@@ -68,5 +64,5 @@ trailer
 /Size 8
 >>
 startxref
-1376
+1352
 %%EOF

@@ -1,0 +1,24 @@
+{
+  "mode": "structural",
+  "tp": 76,
+  "fp": 130,
+  "tn": 209,
+  "fn": 0,
+  "precision": 0.369,
+  "recall": 1.0,
+  "f1": 0.539,
+  "recall_by_technique": {
+    "bg_color_match": "14/14",
+    "bg_color_match_tiny": "6/6",
+    "invisible_render_mode": "13/13",
+    "near_background": "10/10",
+    "offpage": "4/4",
+    "tiny_font": "15/15",
+    "transparent": "7/7",
+    "white_on_white": "7/7"
+  },
+  "false_positive_by_negtype": {
+    "benign_hidden": "130/130",
+    "clean": "0/209"
+  }
+}

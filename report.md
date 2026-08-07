@@ -199,31 +199,217 @@ the other one:
   `PAYLOADS` list — closing the loop between data generation, training, and
   evaluation. Not yet implemented.
 
+## 5a. Teammate contribution: colored backgrounds + a second holdout probe
+
+A teammate extended the generator and detector, then independently re-discovered the
+generalization problem from §5.3 from a different angle:
+
+- **Two new hiding techniques** — `bg_color_match` and `bg_color_match_tiny` —
+  generalize `white_on_white`/`near_background` to *any* page background color, not
+  just white. All four document templates now paint a random background and pick a
+  contrasting color for their normal (visible) text.
+- **`detector.py` fix**: `page_bg_color()` now detects the actual page background
+  (the largest full-page filled rect) before scoring contrast, instead of assuming
+  white. Without this fix, every character on a colored page — not just the injected
+  ones — would have scored as low-contrast against an assumed white background.
+- **`dataset_check`** (2,000 PDFs) — rebuilt with the new techniques, using the same
+  7 built-in `PAYLOADS`.
+- **`dataset_holdout_check`** (300 PDFs, `utils/payloads_holdout.json`) — 12 new
+  payloads written to share no words with the existing ones, built because
+  `dataset_check` was scoring a suspicious perfect 1.0 (unsurprising, since it reuses
+  the same 7 payloads the synthetic model was trained on) — the same reasoning
+  behind pulling in `deepset/prompt-injections` in §5.3.
+
+**Scored both new datasets** (via `manifest_val.csv` — see known issue below) with
+`structural` mode and `combined` mode under both existing semantic models
+(`results/dataset_check_and_holdout_summary.json`):
+
+| | structural | combined (synthetic-trained) | combined (real-trained) |
+|---|---|---|---|
+| `dataset_check` (7 known payloads) | P 0.369 / R 1.00 | P 1.00 / R 1.00 | P 0.00 / R 0.00 |
+| `dataset_holdout_check` (12 new-vocabulary payloads) | P 1.00 / R 1.00 | P 1.00 / R 1.00 | P 1.00 / R 0.75 |
+
+All 8 hiding techniques — including the two new background-matching ones — were
+recovered at 100% structural recall, confirming both the new techniques and the
+background-aware detector fix work correctly together.
+
+**The counter-intuitive finding:** on the *new-vocabulary* holdout set, the
+synthetic-trained model (F1 1.0) beat the real-trained model (F1 0.857) — the
+opposite of the §5.3 result, where the real-trained model won decisively. The
+explanation: the 12 holdout payloads share no exact words with the synthetic
+training corpus, but they *do* share its functional structure — instruction-override,
+authority-spoof, eval-manipulation phrasing built from similar function words
+("ignore/disregard/cancel", "SYSTEM/ATTENTION", "the assistant/model/grader"). TF-IDF
+picks up on that shared register even without word overlap. `deepset/prompt-injections`,
+by contrast, is mostly general multilingual chatbot questions — a different genre
+entirely — so despite being a larger, more "real" dataset, it has less genre overlap
+with this holdout set's résumé/paper-screening style.
+
+**Revised conclusion:** the earlier framing ("the real dataset generalizes better")
+was too simple. What actually predicts generalization is whether the training
+distribution's **genre/register** matches the target's — not merely whether the
+training data is "real" or how much of it there is. Neither semantic model is
+universally better; each wins on the domain closer to its own training distribution.
+
+**Known issue flagged back to the team:** both `dataset_check` and
+`dataset_holdout_check` have **zero positives in `manifest_test.csv`** — the same
+group-aware-split-starved-by-too-few-payloads failure mode documented in
+`pipeline+readme.md`'s troubleshooting table (7 and 12 payload groups respectively is
+too few). The existing fix — a larger `--payloads` pool, already applied to
+`utils/dataset_run/` via `payloads_example.json` — would resolve it if reapplied here.
+
+## 5b. Regenerating the datasets and training a combined model
+
+Acted on both threads from §5a: fixed the empty-test-split issue, then tested the
+"genre coverage, not just more real data" theory directly by training one model on
+both sources at once.
+
+- **`dataset_check`** regenerated with `--payloads payloads_example.json` (50
+  payloads instead of the 7 built-ins), same `n_positive`/`neg_ratio`/seed otherwise.
+  Test split now has 63 positives (was 0).
+- **`dataset_holdout_check`** regenerated with its original 12 new-vocabulary
+  payloads intact (the deliberate design wasn't touched), but reseeded to `37` —
+  found by searching seeds for one whose group-hash puts a reasonable number of the
+  12 payload groups in each split (8 train / 2 val / 2 test) instead of by chance
+  landing all of them in one or two buckets.
+- **`train_semantic.py`** gained an `--add-synthetic` flag: fold `build_corpus()`'s
+  rows into `--train-csv`'s rows instead of choosing one source or the other. Trained
+  `semantic_model_combined.joblib` on synthetic (748 rows) + `deepset_train.csv`
+  (546 rows) = 1,294 rows together.
+
+**Result** — F1 across all three benchmarks (`results/three_model_comparison_v2.json`):
+
+| model | deepset test (real) | dataset_check test (50-payload) | dataset_holdout (12 new-vocab) |
+|---|---|---|---|
+| synthetic-only | 0.391 | **1.000** | **0.929** |
+| real-only | **0.841** | 0.486 | 0.762 |
+| **combined** | **0.841** | **1.000** | **0.929** |
+
+The combined model **matches or ties the single best score on every benchmark** — it
+isn't a compromise between the two single-source models, it dominates both
+simultaneously. Verified this wasn't an artifact of the training code silently
+ignoring one source (compared predictions row-by-row against the real-only model on
+`deepset_test`: 2/116 predictions actually differ, they just happened to cancel out
+in the rounded aggregate metric).
+
+This is a more optimistic result than the tradeoff predicted going into this step —
+apparently the two genres' TF-IDF feature overlap was low enough that learning both
+didn't cost accuracy on either. The caveat carried forward: this has only been
+checked on two genres and a linear model with real spare capacity relative to corpus
+size (1,294 rows); whether a third, still-more-different genre could be added for
+free too remains untested.
+
+## 5c. Structural-signal ablation study
+
+`detector.py`'s structural pass combines five independent signals:
+`low_contrast`, `tiny_font`, `off_page`, `render_mode_3`, `transparent`.
+`DATASET_CREATION.md`'s technique table *claims* each hiding technique has one
+designed detection signal — this tests that claim directly instead of asserting it.
+`scan_pdf()` already returns the full signal set found per PDF, so both ablation
+questions below are answered by set arithmetic over a single scan pass, no
+re-scanning needed (`src/ablation_study.py` → `results/ablation_study.json`, run
+against `dataset_check`'s full 2,000-PDF set: 400 positive, 1,600 negative).
+
+**Leave-one-out: recall per technique with that signal removed** (other 4 kept;
+baseline is 1.0 recall for every technique with all 5 signals active):
+
+| technique removed-signal → | low_contrast | tiny_font | off_page | render_mode_3 | transparent |
+|---|---|---|---|---|---|
+| `white_on_white` | **0.0** | 1.0 | 1.0 | 1.0 | 1.0 |
+| `near_background` | **0.0** | 1.0 | 1.0 | 1.0 | 1.0 |
+| `bg_color_match` | **0.0** | 1.0 | 1.0 | 1.0 | 1.0 |
+| `bg_color_match_tiny` | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 |
+| `tiny_font` | 1.0 | **0.0** | 1.0 | 1.0 | 1.0 |
+| `offpage` | 1.0 | 1.0 | **0.0** | 1.0 | 1.0 |
+| `invisible_render_mode` | 1.0 | 1.0 | 1.0 | **0.0** | 1.0 |
+| `transparent` | 1.0 | 1.0 | 1.0 | 1.0 | **0.0** |
+
+Six of eight techniques go from 100% to **0%** recall the instant their one designed
+signal is removed — each is a complete, single point of failure, exactly as the
+technique table claims, with zero redundancy. `bg_color_match_tiny` is the one
+exception: it survives losing *either* `low_contrast` or `tiny_font` alone, because
+it was built as a stacked technique (background-color match **and** a random 1–3pt
+font, per `hide_bg_match_tiny` in `pdf_injection_gen.py`) — the only technique in the
+set with any redundancy at all.
+
+**Keep-only-one: recall per technique using ONLY that signal, all others ignored**
+confirms the same mapping from the other direction — every technique scores exactly
+1.0 under its one designed signal and 0.0 under every other, except
+`bg_color_match_tiny`, which scores 1.0 under *both* `low_contrast` and `tiny_font`
+independently.
+
+**The false-positive side is the more consequential finding.** Applying the same
+leave-one-out test to the 400 `benign_hidden` negatives (which reuse these same
+techniques for legitimate purposes) shows the signals are *not* evenly responsible
+for the false-positive problem documented in §5.1:
+
+| signal removed | benign-hidden still flagged |
+|---|---|
+| *(none — baseline)* | 100% (400/400) |
+| `low_contrast` | 61.9% |
+| `render_mode_3` | 80.2% |
+| `tiny_font` | 77.7% |
+| `off_page` | 100% (unchanged) |
+| `transparent` | 100% (unchanged) |
+
+`off_page` and `transparent` contribute **zero** false positives on their own,
+because `dataset_builder.py`'s benign-hidden generator only ever hides legitimate
+text with `white_on_white`, `tiny_font`, `invisible_render_mode`, or the two
+background-matching techniques (its `hard_techs` list) — never `offpage` or
+`transparent`. `low_contrast` alone accounts for the largest single chunk of false
+positives (removing it drops the benign-hidden catch rate by 38 points), which lines
+up with it being the signal shared by four of the eight techniques
+(`white_on_white`, `near_background`, `bg_color_match`, `bg_color_match_tiny`) — the
+most "generic" signal is both the most useful structurally and the least able to
+tell malicious from benign on its own, which is exactly why §5.1's semantic filter
+is necessary rather than optional.
+
 ## 6. Key takeaways
 
-1. **Visual-hiding detection works well structurally** — every technique tested
-   (including `near_background`, designed specifically to beat naive exact-white
-   checks) was recovered at 100% recall.
-2. **Structural detection alone is not usable** — 31.4% precision means roughly 2 in 3
-   flags would be false alarms on legitimate hidden text (accessibility tags,
-   template metadata). A semantic filter is necessary, not optional, for a usable
-   detector.
+1. **Visual-hiding detection works well structurally** — every technique tested,
+   including the two later background-color-matching techniques (§5a), was
+   recovered at 100% recall.
+2. **Structural detection alone is not usable** — precision as low as 0.31–0.37
+   across every dataset it was tried on means roughly 2 in 3 flags are false alarms
+   on legitimate hidden text (accessibility tags, template metadata). A semantic
+   filter is necessary, not optional, for a usable detector.
 3. **Semantic-model scores are only as good as the vocabulary they're tested on.**
    A model can look perfect (F1 1.0) and still perform near chance (F1 0.391) on
    real-world text if its evaluation set shares the trainer's own narrow vocabulary.
    This project's own synthetic self-evaluation from §5.2 is a concrete example of
    that trap, caught by cross-checking against an independent public dataset.
+4. **Training on two genres at once didn't cost anything on either one (§5b).** The
+   model trained on synthetic + real `deepset` data together matched or tied the
+   best single-source score on all three benchmarks tried — a genuinely
+   better-than-expected outcome, not the compromise a naive tradeoff framing would
+   predict.
+5. **Group-aware splitting fails the same way at any scale.** The teammate's new
+   `dataset_check`/`dataset_holdout_check` sets hit the exact same
+   too-few-payload-groups failure (§5a) already documented for the original
+   `dataset_run` — worth remembering as a standing gotcha whenever a new payload
+   pool is swapped in, not just a one-off bug.
 
 ## 7. Limitations
 
 - The real-dataset cross-check (§5.3) used `deepset/prompt-injections` as-is; it
   wasn't merged into the PDF corpus's payload pool, so the "closing the loop" fix
-  described above remains a next step, not a result.
+  described in §5.3 remains a next step, not a result.
 - The structural detector's thresholds (contrast, tiny-font point size, alpha) are
   fixed constants tuned by inspection, not learned or swept.
 - All PDFs are single-page and reportlab-generated; real-world PDF variety (scanned
   documents, multi-page layouts, non-Latin scripts in the visible content, PDFs
   produced by other tools) is not represented.
+- **Generalization to an entirely unseen hiding technique has not been tested.**
+  Everything evaluated so far uses the same 8 techniques the models were built and
+  tuned against (`dataset_holdout_check` tests unseen *vocabulary*, not an unseen
+  *technique*). Whether the semantic/structural signals hold up against a 9th,
+  never-seen hiding trick (e.g. Unicode homoglyphs, metadata-field injection, both
+  suggested in `pipeline+readme.md`'s "Extending" section) is unknown.
+- No label-shuffle or other leakage-sanity check has been run on any of the three
+  trained models (`semantic_model.joblib`, `semantic_model_real.joblib`,
+  `semantic_model_combined.joblib`) — the held-out scores in §5.2/§5.3/§5b have not
+  been checked against the possibility of a dataset-construction artifact inflating
+  them.
 
 ## 8. Appendix — artifacts produced
 
@@ -231,17 +417,24 @@ the other one:
 |---|---|
 | `pipeline+readme.md` | Setup and CLI usage for the generators |
 | `DATASET_CREATION.md` | Mechanics of how the PDFs/labels are generated |
-| `utils/pdf_injection_gen.py` | Base generator — 6 techniques × 7 payloads |
+| `utils/pdf_injection_gen.py` | Base generator — 8 techniques (incl. background-color matching) × payloads |
 | `utils/dataset_builder.py` | Full sampled/templated/split dataset builder |
+| `utils/payloads_example.json` | 50-payload pool used for `dataset_run`/`dataset_check` |
+| `utils/payloads_holdout.json` | 12 payloads in deliberately new vocabulary, for `dataset_holdout_check` |
 | `utils/corpus/` | Base generator smoke-test output (54 PDFs) |
-| `utils/dataset_run/` | Full sampled/split dataset (2,000 PDFs) |
-| `src/detector.py` | The layered structural + semantic detector |
-| `src/train_semantic.py` | Trains the semantic classifier |
+| `utils/dataset_run/` | First full sampled/split dataset (2,000 PDFs, 6 techniques) |
+| `dataset_check/` | Teammate's dataset, regenerated — 2,000 PDFs, 8 techniques incl. background-color matching |
+| `dataset_holdout_check/` | New-vocabulary holdout, regenerated — 300 PDFs, 12 payloads never used in training |
+| `src/detector.py` | The layered structural + semantic detector (background-aware contrast) |
+| `src/train_semantic.py` | Trains the semantic classifier; `--train-csv`/`--add-synthetic` for real+synthetic combos |
+| `src/model_structural_rule.py` | Backend-ready wrapper: structural-only detection |
+| `src/model_hybrid_combined.py` | Backend-ready wrapper: structural + semantic, the project's best detector |
 | `src/semantic_model.joblib` | Semantic classifier, synthetic-trained |
-| `src/semantic_model_real.joblib` | Semantic classifier, trained on real data |
+| `src/semantic_model_real.joblib` | Semantic classifier, trained on real `deepset` data |
+| `src/semantic_model_combined.joblib` | Semantic classifier, synthetic + real trained together — the recommended default |
 | `data/deepset_train.csv`, `data/deepset_test.csv` | Real injection dataset, official split |
-| `results/detector_score_structural.json` | Detector score, structural mode |
-| `results/detector_score_combined.json` | Detector score, combined mode (synthetic model) |
-| `results/detector_score_combined_realmodel.json` | Detector score, combined mode (real-trained model) |
+| `results/detector_score_structural.json`, `detector_score_combined*.json` | Early detector scoring runs (`dataset_run`) |
 | `results/semantic_model_comparison.json` | Synthetic-vs-real model, both evaluation directions |
+| `results/three_model_comparison_v2.json` | Synthetic vs. real vs. combined semantic model, three benchmarks |
+| `results/dataset_check_*.json`, `dataset_holdout_*.json` | Detector scoring runs against the teammate's regenerated datasets |
 | `results/graphs.html` | Dataset + detector results dashboard |

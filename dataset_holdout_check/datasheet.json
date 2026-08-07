@@ -1,5 +1,5 @@
 {
-  "seed": 99,
+  "seed": 37,
   "n_positive": 60,
   "neg_ratio": 4,
   "templates": [
@@ -32,37 +32,37 @@
   },
   "splits": {
     "train": {
-      "n": 164,
+      "n": 256,
       "pos": 44,
-      "neg": 120,
-      "pos_rate": 0.268
+      "neg": 212,
+      "pos_rate": 0.172
     },
     "val": {
-      "n": 102,
-      "pos": 16,
-      "neg": 86,
-      "pos_rate": 0.157
+      "n": 34,
+      "pos": 6,
+      "neg": 28,
+      "pos_rate": 0.176
     },
     "test": {
-      "n": 34,
-      "pos": 0,
-      "neg": 34,
-      "pos_rate": 0.0
+      "n": 10,
+      "pos": 10,
+      "neg": 0,
+      "pos_rate": 1.0
     }
   },
   "positives_by_technique": {
     "white_on_white": 8,
-    "near_background": 9,
-    "tiny_font": 7,
-    "invisible_render_mode": 7,
-    "transparent": 8,
-    "offpage": 8,
-    "bg_color_match": 10,
-    "bg_color_match_tiny": 3
+    "near_background": 8,
+    "tiny_font": 12,
+    "invisible_render_mode": 4,
+    "transparent": 11,
+    "offpage": 3,
+    "bg_color_match": 2,
+    "bg_color_match_tiny": 12
   },
   "negatives_by_type": {
-    "clean": 145,
-    "benign_hidden": 77,
-    "near_miss": 18
+    "clean": 147,
+    "benign_hidden": 63,
+    "near_miss": 30
   }
 }

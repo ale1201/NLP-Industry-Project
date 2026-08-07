@@ -1,0 +1,24 @@
+{
+  "mode": "combined",
+  "tp": 12,
+  "fp": 0,
+  "tn": 86,
+  "fn": 4,
+  "precision": 1.0,
+  "recall": 0.75,
+  "f1": 0.857,
+  "recall_by_technique": {
+    "bg_color_match": "2/2",
+    "bg_color_match_tiny": "1/1",
+    "invisible_render_mode": "0/1",
+    "near_background": "1/2",
+    "offpage": "4/4",
+    "tiny_font": "1/2",
+    "transparent": "1/2",
+    "white_on_white": "2/2"
+  },
+  "false_positive_by_negtype": {
+    "clean": "0/79",
+    "near_miss": "0/7"
+  }
+}
