@@ -1,0 +1,17 @@
+# --- API ---
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+pydantic>=2.7
+
+# --- PDF parsing / forensics ---
+pymupdf>=1.24
+# Second, content-stream-faithful extractor; the divergence between the two is
+# what catches off-page text.
+pypdf>=4.0
+
+# --- classifier ---
+# Loads the NLP-Industry-Project repo's pickled TF-IDF pipeline. This is the
+# only text classifier; there is no transformer / torch dependency.
+scikit-learn>=1.5
+joblib>=1.3
