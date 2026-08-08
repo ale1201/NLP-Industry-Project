@@ -1,0 +1,6 @@
+# Extras for the evaluation / probe scripts under training/ and the PDF
+# fixture generators under tests/. Not needed to run the API itself.
+-r requirements.txt
+
+pandas>=2.0        # training/eval_external.py
+reportlab>=4.0     # tests/make_fixtures.py, training/failure_probes.py
