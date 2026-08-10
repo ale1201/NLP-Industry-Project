@@ -56,22 +56,27 @@ export default function App() {
   const [error, setError] = useState('')
   const [dragging, setDragging] = useState(false)
   const [health, setHealth] = useState(null)
+  const [model, setModel] = useState('logreg')
   const inputRef = useRef(null)
 
   useEffect(() => {
     fetch('/api/health')
       .then((r) => (r.ok ? r.json() : null))
-      .then(setHealth)
+      .then((h) => {
+        setHealth(h)
+        if (h?.default_model) setModel(h.default_model)
+      })
       .catch(() => setHealth(null))
   }, [])
 
-  const analyse = useCallback(async (f) => {
+  const analyse = useCallback(async (f, which) => {
     setBusy(true)
     setError('')
     setResult(null)
     try {
       const body = new FormData()
       body.append('file', f)
+      body.append('model', which)
       const res = await fetch('/api/analyze', { method: 'POST', body })
       const payload = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(payload.detail || `Request failed (${res.status})`)
@@ -87,9 +92,18 @@ export default function App() {
     (f) => {
       if (!f) return
       setFile(f)
-      analyse(f)
+      analyse(f, model)
     },
-    [analyse],
+    [analyse, model],
+  )
+
+  // Re-score the current file when the model changes.
+  const changeModel = useCallback(
+    (next) => {
+      setModel(next)
+      if (file) analyse(file, next)
+    },
+    [analyse, file],
   )
 
   const onDrop = useCallback(
@@ -108,11 +122,30 @@ export default function App() {
       <header>
         <h1>PDF Prompt-Injection Detector</h1>
         <p className="sub">
-          Upload a PDF. Its text is scored by the NLP-Industry-Project TF-IDF
-          classifier and the page is checked for text hidden from human readers
-          but visible to a model.
+          Upload a PDF. Its text is scored by the selected classifier and the
+          page is checked for text hidden from human readers but visible to a
+          model.
         </p>
       </header>
+
+      <div className="picker">
+        <label htmlFor="model">Model</label>
+        <select
+          id="model"
+          value={model}
+          onChange={(e) => changeModel(e.target.value)}
+          disabled={busy}
+        >
+          {(health?.models?.length
+            ? health.models
+            : [{ id: 'logreg', label: 'TF-IDF + Logistic Regression' }, { id: 'svm', label: 'TF-IDF + SVM' }]
+          ).map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div
         className={`drop ${dragging ? 'over' : ''}`}
@@ -156,6 +189,7 @@ export default function App() {
             <div><dt>Pages</dt><dd>{result.pages}</dd></div>
             <div><dt>Characters</dt><dd>{result.char_count.toLocaleString()}</dd></div>
             <div><dt>Classifier score</dt><dd>{result.model_score.toFixed(3)}</dd></div>
+            <div><dt>Model</dt><dd>{result.model_name}</dd></div>
             <div><dt>Time</dt><dd>{result.elapsed_ms} ms</dd></div>
           </dl>
 
@@ -180,12 +214,11 @@ export default function App() {
 
       <footer>
         {health ? (
-          <>
-            Model: <code>{health.model_name}</code>
-            {health.semantic_model_available === false && (
-              <span className="warn"> — model not loaded; check the backend</span>
-            )}
-          </>
+          health.models?.length ? (
+            <>Models available: <code>{health.models.map((m) => m.label).join(', ')}</code></>
+          ) : (
+            <span className="warn">No model loaded — check the backend.</span>
+          )
         ) : (
           <span className="warn">Backend unreachable — is uvicorn running on :8000?</span>
         )}

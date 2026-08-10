@@ -31,12 +31,14 @@ def _verdict(risk: float) -> str:
     return "clean"
 
 
-def analyse_pdf(raw: bytes, filename: str) -> dict:
+def analyse_pdf(raw: bytes, filename: str, model: str | None = None) -> dict:
     started = time.perf_counter()
-    return analyse_parsed(pdf_forensics.analyse(raw), filename, started)
+    return analyse_parsed(pdf_forensics.analyse(raw), filename, started, model)
 
 
-def analyse_parsed(parsed: dict, filename: str, started: float | None = None) -> dict:
+def analyse_parsed(
+    parsed: dict, filename: str, started: float | None = None, model: str | None = None
+) -> dict:
     # Takes an already-parsed document so a corpus can be parsed once and
     # scored many times; parsing is the expensive part.
     started = time.perf_counter() if started is None else started
@@ -45,8 +47,8 @@ def analyse_parsed(parsed: dict, filename: str, started: float | None = None) ->
     signals = parsed["signals"]
     hidden = parsed.get("hidden_text", "")
 
-    doc_score, chunks = semantic.score_text(text)
-    hidden_score = semantic.score_text(hidden)[0] if hidden.strip() else 0.0
+    doc_score, chunks = semantic.score_text(text, model)
+    hidden_score = semantic.score_text(hidden, model)[0] if hidden.strip() else 0.0
     struct = _structural_risk(signals)
 
     if struct > 0.0 and hidden.strip():
@@ -61,7 +63,7 @@ def analyse_parsed(parsed: dict, filename: str, started: float | None = None) ->
     # doc_score gives a visible injection (no hidden text) its own path.
     risk = 1.0 - (1.0 - hidden_component) * (1.0 - doc_score)
 
-    info = semantic.info()
+    info = semantic.info(model)
     return {
         "filename": filename,
         "pages": parsed["pages"],
@@ -70,6 +72,7 @@ def analyse_parsed(parsed: dict, filename: str, started: float | None = None) ->
         "model_score": round(doc_score, 4),
         "hidden_score": round(hidden_score, 4),
         "hidden_text": hidden[:1500],
+        "model": info["model"],
         "model_name": info["model_name"],
         "signals": signals,
         "top_chunks": chunks[:5],
