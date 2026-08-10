@@ -6,12 +6,22 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Trained classifier. Default is the combined model; other variants
-# (_real, _svm, _nb, _synthetic) live in the same folder.
-SEMANTIC_MODEL_PATH = os.getenv(
-    "PID_SEMANTIC_MODEL",
-    str(BASE_DIR / "models" / "semantic" / "semantic_model_combined.joblib"),
-)
+_MODELS_DIR = BASE_DIR / "models" / "semantic"
+
+# The two selectable classifiers. Each is a separate joblib pipeline; the app
+# only ever loads one at a time (they are never combined).
+MODELS = {
+    "logreg": {
+        "label": "TF-IDF + Logistic Regression",
+        "path": str(_MODELS_DIR / "semantic_model_combined.joblib"),
+    },
+    "svm": {
+        "label": "TF-IDF + SVM",
+        "path": str(_MODELS_DIR / "semantic_model_svm.joblib"),
+    },
+}
+
+DEFAULT_MODEL = os.getenv("PID_DEFAULT_MODEL", "logreg")
 
 MAX_UPLOAD_MB = float(os.getenv("PID_MAX_UPLOAD_MB", "20"))
 MAX_PAGES = int(os.getenv("PID_MAX_PAGES", "200"))

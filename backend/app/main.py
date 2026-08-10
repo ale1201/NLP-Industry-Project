@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import fitz
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import analysis, config, semantic
@@ -25,19 +25,29 @@ app.add_middleware(
 
 @app.get("/api/health", response_model=HealthResponse)
 def health() -> HealthResponse:
-    # Warms the model so the first upload isn't slow.
-    if not semantic.available():
-        return HealthResponse(
-            status=f"degraded: no model loaded from {config.SEMANTIC_MODEL_PATH}",
-            model_name="unavailable",
-            semantic_model_available=False,
-        )
-    return HealthResponse(status="ok", semantic_model_available=True, **semantic.info())
+    # Warms the default model so the first upload isn't slow.
+    models = semantic.list_models()
+    if not models:
+        return HealthResponse(status="degraded: no models loaded", models=[])
+    return HealthResponse(
+        status="ok",
+        models=models,
+        default_model=config.DEFAULT_MODEL,
+    )
 
 
 @app.post("/api/analyze", response_model=AnalyzeResponse)
-async def analyze(file: UploadFile = File(...)) -> AnalyzeResponse:
+async def analyze(
+    file: UploadFile = File(...),
+    model: str = Form(config.DEFAULT_MODEL),
+) -> AnalyzeResponse:
     raw = await file.read()
+
+    if model not in config.MODELS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Unknown model {model!r}; choose one of {', '.join(config.MODELS)}.",
+        )
 
     if not raw:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
@@ -56,7 +66,7 @@ async def analyze(file: UploadFile = File(...)) -> AnalyzeResponse:
         )
 
     try:
-        result = analysis.analyse_pdf(raw, file.filename or "upload.pdf")
+        result = analysis.analyse_pdf(raw, file.filename or "upload.pdf", model)
     except fitz.FileDataError as exc:
         raise HTTPException(
             status_code=422, detail=f"The PDF could not be parsed: {exc}"

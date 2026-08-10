@@ -36,6 +36,7 @@ class AnalyzeResponse(BaseModel):
     model_score: float = Field(..., description="Classifier score on the document text")
     hidden_score: float = Field(0.0, description="Classifier score on the hidden text")
     hidden_text: str = Field("", description="Text hidden from a human reader")
+    model: str = Field(..., description="Model key that scored this document")
     model_name: str
     signals: list[Signal]
     top_chunks: list[Chunk]
@@ -43,9 +44,12 @@ class AnalyzeResponse(BaseModel):
     elapsed_ms: int
 
 
+class ModelInfo(BaseModel):
+    id: str
+    label: str
+
+
 class HealthResponse(BaseModel):
     status: str
-    model_name: str
-    semantic_model_available: bool = Field(
-        False, description="Whether the TF-IDF pipeline could be loaded"
-    )
+    models: list[ModelInfo] = Field(default_factory=list, description="Selectable models")
+    default_model: str | None = None
