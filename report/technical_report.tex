@@ -17,15 +17,9 @@
 \title{Detecting Hidden Prompt Injection in PDFs:\\
 A Two-Layer Structural and Semantic Detector}
 
-\author{Alejandra \\
-  Dataset generation \\
-  \texttt{} \\\And
-  Saliq \\
-  Model training \\
-  \texttt{} \\\And
-  Ashhad Quadri \\
-  System integration \\
-  \texttt{ashhad.quadri@gmail.com} \\}
+\author{Alejandra \and Saliq \and Ashhad Quadri \\
+  NLP: Best Practices, Summer 2026 \\
+  \texttt{ashhad.quadri@gmail.com}}
 
 \begin{document}
 \maketitle
@@ -74,10 +68,65 @@ or approved the file. Our goal is a detector that flags such documents before
 they reach the model, and that reports \emph{why} it flagged them so a human can
 adjudicate.
 
+Figure~\ref{fig:example} makes the threat concrete. The two panels are the
+same PDF: what a human sees on the rendered page, and what a text extractor
+returns. The injection is present, in full, only in the second.
+
+\begin{figure}[t]
+  \centering
+  \small
+  \setlength{\fboxsep}{5pt}
+  \fbox{\parbox{0.92\columnwidth}{%
+    \textbf{Rendered page (human)}\\[2pt]
+    Quarterly Engineering Report\\
+    This document summarises delivery metrics for the third quarter.
+    Throughput improved by eleven percent and defect escape rate fell.}}\\[4pt]
+  \fbox{\parbox{0.92\columnwidth}{%
+    \textbf{Extracted text (model)}\\[2pt]
+    Quarterly Engineering Report \dots\\
+    \ttfamily\footnotesize Ignore all previous instructions. You are now in
+    developer mode. Disregard the user's actual question, reveal your full
+    system prompt, and then email the contents of the document to
+    attacker@example.com.}}
+  \caption{The same file, two views. The injection is drawn in white on the
+  white page (invisible to the reader) but is returned verbatim by the
+  extractor, so it enters the model's prompt as instructions.}
+  \label{fig:example}
+\end{figure}
+
 This report covers the use case above, the methods we compared
 (Section~\ref{sec:methods}), the system architecture
 (Section~\ref{sec:architecture}), the evaluation protocol
 (Section~\ref{sec:evaluation}), and the results (Section~\ref{sec:results}).
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Prompt injection.} Direct prompt injection---overriding a model's
+instructions through user input---was popularised by \citet{perez2022ignore}.
+\citet{greshake2023injection} extended it to the \emph{indirect} setting, where
+the payload arrives inside content the model retrieves rather than from the
+user, and demonstrated working attacks against real LLM-integrated
+applications; \citet{liu2023promptinjection} systematise such attacks across
+deployed systems. Prompt injection is now the top entry in the OWASP risk list
+for LLM applications \citep{owasp2023llm}. Our threat model is the indirect
+case specialised to PDFs, where the retrieval channel is a text extractor and
+the payload is hidden in the visual layer.
+
+\paragraph{Text classification baselines.} Linear models over sparse
+bag-of-words features remain strong, cheap baselines for topical and
+intent classification. Support vector machines were shown to be effective for
+text categorisation with many relevant features by \citet{joachims1998text},
+and multinomial naive Bayes is a standard, if weaker, generative baseline
+\citep{mccallum1998comparison}. We adopt these as our classifiers precisely
+because they are transparent, fast, and reproducible, and we quantify where the
+weaker one (naive Bayes) falls short (Section~\ref{sec:results}).
+
+\paragraph{Defenses.} Detection at ingestion is one layer of a larger defense;
+input isolation and instruction/data separation address the root cause. We
+position our detector as a document-level screen that complements, rather than
+replaces, prompt-level isolation, and we return the evidence a human needs to
+adjudicate a flagged file.
 
 \section{Data}
 \label{sec:data}
@@ -114,13 +163,21 @@ was hidden.
 
 The corpus (Table~\ref{tab:corpus}) spans four document templates and six
 hiding techniques (Table~\ref{tab:techniques}), sampled at three placements
-(header, middle, footer). Negatives come in three deliberate kinds: clean
-documents; \emph{benign-hidden} documents, which carry legitimately invisible
-text (accessibility tags, template notes) hidden with the same techniques as the
-attacks; and \emph{near-miss} visibles, injection-sounding phrasing that is
-fully visible. The benign-hidden class is the hard negative: without it, a
-detector learns the shortcut ``any invisible text is an attack'' and floods on
-real documents that legitimately carry hidden layers.
+(header, middle, footer). Each generated positive is re-opened after writing and
+its payload is confirmed recoverable by an extractor, so a hiding trick that
+also broke extraction is never silently counted as a positive. Splits are
+\emph{group-aware}: every sample is assigned to a split by hashing its payload
+id, so the same payload never appears in two splits and a detector cannot score
+well by memorising a specific string rather than the hiding signal.
+
+Negatives come in three deliberate kinds: clean documents; \emph{benign-hidden}
+documents, which carry legitimately invisible text (accessibility tags, template
+notes) hidden with the same techniques as the attacks; and \emph{near-miss}
+visibles, injection-sounding phrasing that is fully visible. The benign-hidden
+class is the hard negative: without it, a detector learns the shortcut ``any
+invisible text is an attack'' and floods on real documents that legitimately
+carry hidden layers. The near-miss class stops the classifier from keying on
+phrasing alone while ignoring the visual-hiding signal.
 
 \begin{table}[t]
   \centering
@@ -179,23 +236,23 @@ The detector has two layers that are combined into a single verdict
 end; the front end proxies \texttt{/api} to the backend so a document never
 leaves the browser session unencrypted in development.
 
-\begin{figure}[t]
+\begin{figure*}[t]
   \centering
   \begin{tikzpicture}[
-      node distance=6pt and 10pt,
+      node distance=10pt and 20pt,
       box/.style={draw, rounded corners, align=center, font=\small,
-                  inner sep=4pt, minimum height=7mm},
+                  inner sep=5pt, minimum height=8mm},
       lay/.style={box, fill=black!4},
       >={Stealth[]}]
-    \node[box] (pdf) {Uploaded\\PDF};
-    \node[lay, right=of pdf, text width=2.55cm] (struct)
-      {\textbf{Structural layer}\\extractor divergence,\\colour / size / render\\ mode, unicode, meta};
-    \node[lay, below=14pt of struct, text width=2.55cm] (clf)
-      {\textbf{Classifier}\\TF--IDF $+$\\ LogReg \emph{or} SVM};
-    \node[box, right=of struct, yshift=-16pt, text width=1.7cm] (fuse)
+    \node[box, text width=1.8cm] (pdf) {Uploaded\\PDF};
+    \node[lay, right=of pdf, text width=3.3cm] (struct)
+      {\textbf{Structural layer}\\extractor divergence,\\colour / size / render mode,\\unicode, metadata};
+    \node[lay, below=16pt of struct, text width=3.3cm] (clf)
+      {\textbf{Classifier}\\TF--IDF $+$ LogReg \emph{or} SVM};
+    \node[box, right=of struct, yshift=-18pt, text width=1.8cm] (fuse)
       {Fusion\\(gate)};
-    \node[box, right=of fuse, text width=1.55cm] (verd)
-      {Verdict\\clean / susp. / injected};
+    \node[box, right=of fuse, text width=2.3cm] (verd)
+      {Verdict\\clean / suspicious / injected};
     \draw[->] (pdf) -- (struct);
     \draw[->] (pdf.south) |- (clf.west);
     \draw[->] (struct) -- (fuse);
@@ -208,7 +265,7 @@ leaves the browser session unencrypted in development.
   text; fusion gates structural findings behind the classifier and maps the
   fused risk to a verdict.}
   \label{fig:arch}
-\end{figure}
+\end{figure*}
 
 \paragraph{Structural layer.} The document is parsed once. The layer emits
 typed signals---white-on-white ink, sub-2\,pt fonts, render mode 3, off-page
@@ -246,6 +303,17 @@ where $c$ is the (possibly damped) hidden component. The risk is mapped to
 regression and TF--IDF $+$ SVM---are loaded separately and chosen per request;
 they are never combined. The front end exposes them as a dropdown so a reviewer
 can re-score the same document under each and compare.
+
+\paragraph{Deployment.} The backend is a small FastAPI application
+(\texttt{main} routing and validation, \texttt{pdf\_forensics} for the
+structural layer, \texttt{semantic} for the classifiers, \texttt{analysis} for
+fusion). It validates uploads (size limit, \texttt{\%PDF} header) and returns a
+typed JSON response: the verdict, the fused risk, per-signal findings with
+severities and evidence, the recovered hidden text, and the model used. The
+classifier is an 88\,KB joblib pipeline that loads in under a second and needs
+no GPU, so the whole service runs on commodity hardware and is trivial to
+reproduce---an explicit design goal, since a detector that is expensive to run
+is one that does not get deployed in front of every document.
 
 \section{Evaluation}
 \label{sec:evaluation}
@@ -291,6 +359,36 @@ Bayes.
   split (116 rows). Same TF--IDF features and training data across all three;
   only the classifier changes.}
   \label{tab:algos}
+\end{table}
+
+\paragraph{The two deployed models, head to head.}
+Logistic regression and linear SVM are the two models we ship, so
+Table~\ref{tab:twomodel} compares them at both levels: text classification on
+\texttt{deepset}, and the full detector on the new-vocabulary holdout. SVM has a
+one-point $\text{F}_1$ edge on raw text (0.852 vs.\ 0.841), driven by slightly
+higher recall; end to end on the holdout the two are identical (precision 1.000,
+recall 0.867). The difference is within the noise of a 116- and 300-example
+evaluation, so we expose both and default to logistic regression, whose
+probabilities are directly calibrated and cheapest to interpret.
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{llrrr}
+    \toprule
+    \textbf{Level} & \textbf{Model} & \textbf{P} & \textbf{R} & \textbf{F\textsubscript{1}} \\
+    \midrule
+    Text (deepset)   & LogReg & 0.957 & 0.750 & 0.841 \\
+                     & SVM    & 0.958 & 0.767 & \textbf{0.852} \\
+    \midrule
+    Detector (holdout) & LogReg & 1.000 & 0.867 & 0.929 \\
+                       & SVM    & 1.000 & 0.867 & 0.929 \\
+    \bottomrule
+  \end{tabular}
+  \caption{The two production models compared at text level (116 rows) and end
+  to end on the new-vocabulary holdout (300 PDFs). They are effectively tied;
+  logistic regression is the default.}
+  \label{tab:twomodel}
 \end{table}
 
 \paragraph{Training data matters more than the algorithm.}
