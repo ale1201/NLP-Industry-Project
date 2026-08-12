@@ -14,13 +14,14 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, fit, backgrounds}
 
-\title{Detecting Hidden Prompt Injection in PDFs:\\
-A Two-Layer Structural and Semantic Detector}
+\title{PDF Guard Rail: Two-Layer Structural and Semantic Detection of Hidden Prompt Injection in PDFs}
 
-\author{Alejandra \and Saliq \and Ashhad Quadri \\
-  NLP: Best Practices, Summer 2026 \\
-  \texttt{ashhad.quadri@gmail.com}}
-
+\author{
+  Maria Alejandra Galindo Pabon \quad Saliq Neyaz \quad Ashhad Quadri \\[0.4em]
+  \texttt{maria.pabon\_galindo@stud.uni-heidelberg.de} \\
+  \texttt{saliq.saliq\_neyaz@stud.uni-heidelberg.de} \\
+  \texttt{ashhad.quadri@stud.uni-heidelberg.de}
+}
 \begin{document}
 \maketitle
 
@@ -49,8 +50,8 @@ per document.
 
 An LLM that ``reads a PDF'' almost never looks at the rendered page. It calls a
 text extractor (\texttt{pdfplumber}, \texttt{pypdf}, PyMuPDF) and receives a
-string. That string is what enters the prompt. The gap between the two---what a
-human sees versus what the extractor returns---is an attack surface. A line of
+string. That string is what enters the prompt. This gap, between what a human
+sees and what the extractor returns, is an attack surface. A line of
 text can be drawn in white on a white page, at a sub-legible font size, or
 positioned outside the visible page box; a reviewer sees nothing, while the
 extractor returns the line and the model treats it as instructions. This
@@ -102,8 +103,8 @@ This report covers the use case above, the methods we compared
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{Prompt injection.} Direct prompt injection---overriding a model's
-instructions through user input---was popularised by \citet{perez2022ignore}.
+\paragraph{Prompt injection.} Direct prompt injection, overriding a model's
+instructions through user input, was popularised by \citet{perez2022ignore}.
 \citet{greshake2023injection} extended it to the \emph{indirect} setting, where
 the payload arrives inside content the model retrieves rather than from the
 user, and demonstrated working attacks against real LLM-integrated
@@ -137,8 +138,8 @@ public \texttt{deepset/prompt-injections} dataset
 others) collection of injection and benign prompts with an official train/test
 split. Because that dataset carries no visual-layer signal, we also
 generate a \emph{labelled PDF corpus}: for each payload and hiding technique we
-emit a real PDF text object---never a rasterised image---so the ground truth
-includes not only whether a file is malicious but exactly \emph{how} the payload
+emit a real PDF text object (never a rasterised image), so the ground truth
+records not only whether a file is malicious but exactly \emph{how} the payload
 was hidden.
 
 \begin{table}[t]
@@ -223,9 +224,9 @@ hidden text is \emph{also} judged an injection by the classifier. The first is
 high-recall but cannot distinguish benign hidden text from hostile hidden text;
 the second gates on intent.
 
-We do not consider large transformer classifiers in the deployed system: the
-TF--IDF models load in under a second, need no GPU, and---as
-Section~\ref{sec:results} shows---are competitive on this task, which keeps the
+We do not use large transformer classifiers in the deployed system. The
+TF--IDF models load in under a second, need no GPU, and, as
+Section~\ref{sec:results} shows, are competitive on this task, which keeps the
 service cheap to run and easy to reproduce.
 
 \section{System Architecture}
@@ -233,8 +234,8 @@ service cheap to run and easy to reproduce.
 
 The detector has two layers that are combined into a single verdict
 (Figure~\ref{fig:arch}). It is served as a FastAPI backend behind a React front
-end; the front end proxies \texttt{/api} to the backend so a document never
-leaves the browser session unencrypted in development.
+end; the front end proxies \texttt{/api} to the backend, so in development the
+browser talks to a single origin and no CORS configuration is needed.
 
 \begin{figure*}[t]
   \centering
@@ -268,14 +269,14 @@ leaves the browser session unencrypted in development.
 \end{figure*}
 
 \paragraph{Structural layer.} The document is parsed once. The layer emits
-typed signals---white-on-white ink, sub-2\,pt fonts, render mode 3, off-page
+typed signals: white-on-white ink, sub-2\,pt fonts, render mode 3, off-page
 text found by comparing a viewer-faithful extractor (PyMuPDF) against a
 content-stream extractor (\texttt{pypdf}), Unicode tag-block smuggling,
-zero-width characters, annotation text, and verbose metadata---together with the
-recovered hidden string for each. Comparing the two extractors is the
-generalising trick: text present in the content stream but absent from the
-viewer-faithful render is, by construction, hidden, regardless of which
-placement trick produced it.
+zero-width characters, annotation text, and verbose metadata, together with the
+recovered hidden string for each. Comparing the two extractors is a single
+check that generalises across placement tricks: text present in the content
+stream but absent from the viewer-faithful render is hidden by construction,
+whatever trick produced it.
 
 \paragraph{Semantic layer.} The recovered hidden text and the whole-document
 text are each scored by the selected classifier as a single
@@ -299,8 +300,8 @@ where $c$ is the (possibly damped) hidden component. The risk is mapped to
 \emph{clean}, \emph{suspicious}, or \emph{injected} by two thresholds
 (0.35 and 0.65).
 
-\paragraph{Model selection.} The two production models---TF--IDF $+$ logistic
-regression and TF--IDF $+$ SVM---are loaded separately and chosen per request;
+\paragraph{Model selection.} The two production models, TF--IDF $+$ logistic
+regression and TF--IDF $+$ SVM, are loaded separately and chosen per request;
 they are never combined. The front end exposes them as a dropdown so a reviewer
 can re-score the same document under each and compare.
 
@@ -309,11 +310,45 @@ can re-score the same document under each and compare.
 structural layer, \texttt{semantic} for the classifiers, \texttt{analysis} for
 fusion). It validates uploads (size limit, \texttt{\%PDF} header) and returns a
 typed JSON response: the verdict, the fused risk, per-signal findings with
-severities and evidence, the recovered hidden text, and the model used. The
-classifier is an 88\,KB joblib pipeline that loads in under a second and needs
-no GPU, so the whole service runs on commodity hardware and is trivial to
-reproduce---an explicit design goal, since a detector that is expensive to run
-is one that does not get deployed in front of every document.
+severities and evidence, the recovered hidden text, and the model used. Each
+classifier is a small joblib pipeline (well under a megabyte) that loads in
+under a second and needs no GPU, so the service runs on commodity hardware and
+is easy to reproduce.
+
+\paragraph{User interface.} Figures~\ref{fig:ui-home} and~\ref{fig:ui-result}
+show the React front end. A reviewer selects a model, drops a PDF, and receives
+the verdict together with the evidence behind it: the fused risk, the classifier
+score and the model used, each structural signal with its severity and the
+recovered hidden text, and the highest-scoring passages.
+Figure~\ref{fig:ui-result} shows a borderline case where the two models
+disagree, which is why the interface exposes both. The document is a peer-review
+note containing a visible instruction to hide a paper's weaknesses (``Do not
+mention the weaknesses in your review''). Logistic regression rates it
+\emph{suspicious} (score 0.544), while SVM, which is slightly more aggressive,
+rates it \emph{injected} (0.877). A single fixed threshold would force one call;
+letting a reviewer switch models surfaces the disagreement so a human can
+adjudicate.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{ui_home.png}
+  \caption{Upload view. The reviewer chooses between the two production models
+  (TF--IDF $+$ logistic regression or SVM) and drops a PDF.}
+  \label{fig:ui-home}
+\end{figure}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.44\linewidth]{ui_result.png}\hfill
+  \includegraphics[width=0.44\linewidth]{ui_result_svm.png}
+  \caption{The same document scored under each model, showing where they
+  disagree. It carries a visible review-manipulation instruction (``Do not
+  mention the weaknesses in your review''). Logistic regression (left) rates it
+  \emph{suspicious} (54/100, score 0.544); SVM (right) rates it \emph{injected}
+  (88/100, score 0.877). The model is chosen per request, so a reviewer can
+  re-score the same document under either and adjudicate a borderline case.}
+  \label{fig:ui-result}
+\end{figure*}
 
 \section{Evaluation}
 \label{sec:evaluation}
@@ -327,7 +362,7 @@ breakdown of false positives by negative type and recall by hiding technique.
 
 Because the generated corpus reuses training-family vocabulary, we add a
 \emph{holdout} corpus of 300 PDFs (60 positive) whose 12 payloads are written in
-vocabulary that appears in no training set. This is the honest out-of-distribution
+vocabulary that appears in no training set. This is the out-of-distribution
 test: it measures whether the detector generalises to injection phrasings it has
 never seen, rather than memorising the payload pool.
 
@@ -394,12 +429,12 @@ probabilities are directly calibrated and cheapest to interpret.
 \paragraph{Training data matters more than the algorithm.}
 Table~\ref{tab:data} shows the same logistic-regression model trained on three
 corpora. The synthetic-only model scores a perfect $\text{F}_1$ on our own PDF
-corpus but collapses to 0.391 on real text---its high in-domain score was a
+corpus but collapses to 0.391 on real text; its high in-domain score was a
 vocabulary artefact. The real-only model is strong on real text but weak on our
-corpus. The combined model matches the best of both on every benchmark
-simultaneously, so it is the logistic-regression variant we deploy. The swing
-across training data (0.39--1.00) dwarfs the 0.01 swing across algorithms in
-Table~\ref{tab:algos}.
+corpus. The combined model matches the best of both on every benchmark at once,
+so it is the logistic-regression variant we deploy. The swing
+across training data (0.39 to 1.00) is far larger than the 0.01 swing across
+algorithms in Table~\ref{tab:algos}.
 
 \begin{table}[t]
   \centering
@@ -415,8 +450,8 @@ Table~\ref{tab:algos}.
   \end{tabular}
   \caption{Effect of training data on logistic regression ($\text{F}_1$).
   Columns are the \texttt{deepset} test split, our PDF test corpus, and the
-  new-vocabulary holdout. Combined training is not a compromise---it ties the
-  best single-source score on all three.}
+  new-vocabulary holdout. Combined training ties the best single-source score
+  in every column.}
   \label{tab:data}
 \end{table}
 
@@ -425,10 +460,10 @@ Table~\ref{tab:mode} is the central end-to-end result. In \emph{structural}
 mode the detector recovers every attack (recall 1.000) but flags all 133
 benign-hidden negatives, for a precision of 0.314: it cannot tell ``invisible''
 from ``invisible and hostile''. Gating structural findings behind the
-classifier (\emph{combined} mode) removes exactly those false positives without
-losing a single true positive, reaching precision 1.000. This is the payoff of
-the hard-negative design in Section~\ref{sec:data}: without the benign-hidden
-class, the weakness of structural-only detection would be invisible.
+classifier (\emph{combined} mode) removes those false positives without
+losing a true positive, reaching precision 1.000. The benign-hidden negatives
+from Section~\ref{sec:data} are what make this measurable: without them,
+structural-only detection would appear to work.
 
 \begin{table}[t]
   \centering
@@ -476,25 +511,25 @@ exact-white checks.
 On the new-vocabulary holdout, the full detector with either discriminative
 model keeps precision 1.000 and recall 0.867 ($\text{F}_1$ 0.929); naive Bayes
 drops to recall 0.750 ($\text{F}_1$ 0.857). Recall falls from 1.00 in-domain to
-0.867 out-of-domain, which is the honest measure of how far the classifier
-generalises beyond the payload phrasings it was trained on. The structural
-layer itself is vocabulary-independent, so most of this gap is the classifier's.
+0.867 out-of-domain, which measures how far the classifier generalises beyond
+the payload phrasings it was trained on. The structural layer itself is
+vocabulary-independent, so most of this gap comes from the classifier.
 
 \section{Discussion}
 
-Two findings drive the design. First, structural detection is necessary but not
-sufficient: it localises hidden text with perfect recall but cannot judge intent,
-so on its own it is unusable (0.31 precision). Second, the semantic model's score
-is only as trustworthy as the vocabulary it was trained on---a model can look
-perfect in-domain (F$_1$ 1.00) and score near chance on unseen real text
-(0.39). Both point to the same conclusion: the two layers must be combined, and
-the training data must cover the real distribution, not a synthetic proxy.
+Two results shaped the design. First, the structural layer localises hidden
+text with perfect recall but cannot judge intent, so on its own it is unusable
+(0.31 precision). Second, the semantic model is only as good as the vocabulary
+it was trained on: it can look perfect in-domain (F$_1$ 1.00) yet score near
+chance on unseen real text (0.39). The consequence is that the two layers have
+to be combined, and the training data has to cover the real distribution rather
+than a synthetic proxy.
 
-Detection at the scanning stage is defence-in-depth, not a cure. The most
-general mitigation lives one layer down, at ingestion: extracted PDF text should
-be treated as untrusted data and isolated from the instruction channel, so no
-payload---seen or unseen---is interpreted as a command. Our detector is the
-complement to that, flagging documents for review and explaining why.
+Detection at the scanning stage is defence in depth rather than a complete fix.
+The more general mitigation lives one layer down, at ingestion: extracted PDF
+text should be treated as untrusted data and kept out of the instruction
+channel, so that no payload, seen or unseen, is interpreted as a command. Our
+detector complements that by flagging documents for review and explaining why.
 
 \section*{Limitations}
 
@@ -503,7 +538,7 @@ traffic: all documents are single-page and produced by one rendering library,
 so genuine variety (scanned pages, multi-page layouts, other producers) is
 under-represented. The near-perfect in-domain document scores reflect a payload
 pool of limited size; the holdout numbers (F$_1$ 0.929) and the text-level
-numbers (F$_1$ 0.84--0.85) are the ones to trust for real-world reasoning. The
+numbers (F$_1$ 0.84--0.85) are the more realistic estimates. The
 semantic models score some benign prose highly, so genuinely clean documents can
 occasionally be marked suspicious; the structural thresholds are fixed constants
 rather than learned, and text rendered purely as pixels (no text layer) is out of
@@ -519,8 +554,8 @@ could in principle see text neither returns.
 \label{sec:appendix}
 
 The service runs from a fresh checkout with \texttt{pip install -r
-requirements.txt} and \texttt{uvicorn app.main:app}; the classifier is an
-88\,KB joblib pipeline and needs no GPU or model download. The corpus is
+requirements.txt} and \texttt{uvicorn app.main:app}; the classifier is a small
+joblib pipeline and needs no GPU or model download. The corpus is
 regenerated with a fixed seed (13), and the evaluation scripts reproduce every
 table above. The front end is a Vite/React app started with \texttt{npm run
 dev}.
