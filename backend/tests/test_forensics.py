@@ -37,6 +37,7 @@ def _ids(result: dict) -> set[str]:
         ("attack_offpage.pdf", "extractor-divergence"),
         ("attack_unicode.pdf", "unicode-tag-smuggling"),
         ("attack_annotation.pdf", "annotation-text"),
+        ("colored_bg_attack.pdf", "white-text"),
     ],
 )
 def test_vector_is_detected(fixture, expected_signal):
@@ -52,6 +53,7 @@ def test_vector_is_detected(fixture, expected_signal):
         "attack_offpage.pdf",
         "attack_annotation.pdf",
         "attack_visible.pdf",
+        "colored_bg_attack.pdf",
     ],
 )
 def test_payload_reaches_the_classifier(fixture):
@@ -63,6 +65,15 @@ def test_payload_reaches_the_classifier(fixture):
 def test_clean_pdf_is_silent():
     """The false-positive guard. A benign document must raise nothing."""
     result = _analyse("clean.pdf")
+    assert result["signals"] == []
+    assert PAYLOAD_MARKER not in result["text"]
+
+
+def test_clean_pdf_on_colored_background_is_silent():
+    """The contrast check must compare text color against the *actual* page
+    background, not a hardcoded near-white constant — otherwise legitimate
+    light-on-dark text (any themed/colored document) reads as hidden."""
+    result = _analyse("colored_bg_clean.pdf")
     assert result["signals"] == []
     assert PAYLOAD_MARKER not in result["text"]
 

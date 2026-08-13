@@ -117,6 +117,41 @@ def visible_injection():
     doc.close()
 
 
+# A page background nobody would mistake for white, so these two fixtures
+# exercise the "compare against the *actual* background" path instead of the
+# "compare against white" path every other fixture in this file takes.
+COLORED_BG = (0.25, 0.40, 0.60)
+COLORED_BG_FG = (0.95, 0.95, 0.95)  # correct, legible contrast against COLORED_BG
+
+
+def _colored_bg_page(doc):
+    page = doc.new_page()
+    page.draw_rect(page.rect, color=None, fill=COLORED_BG)
+    page.insert_text((72, 90), "Quarterly Engineering Report", fontsize=16, color=COLORED_BG_FG)
+    page.insert_textbox(fitz.Rect(72, 110, 520, 260), BODY[28:], fontsize=11, color=COLORED_BG_FG)
+    return page
+
+
+def colored_bg_clean():
+    """False-positive guard: light text is legitimate on a dark page — it must
+    not be flagged just because it looks 'near white' in isolation."""
+    doc = fitz.open()
+    _colored_bg_page(doc)
+    doc.save(OUT / "colored_bg_clean.pdf")
+    doc.close()
+
+
+def colored_bg_attack():
+    """Payload colored to match a non-white page background. Catching this
+    requires comparing text color against the *actual* page background, not
+    a hardcoded 'near white' constant."""
+    doc = fitz.open()
+    page = _colored_bg_page(doc)
+    page.insert_textbox(BOX, PAYLOAD, fontsize=11, color=COLORED_BG)
+    doc.save(OUT / "colored_bg_attack.pdf")
+    doc.close()
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     for fn in (
@@ -128,6 +163,8 @@ if __name__ == "__main__":
         unicode_tricks,
         annotation_payload,
         visible_injection,
+        colored_bg_clean,
+        colored_bg_attack,
     ):
         fn()
         print(f"wrote {fn.__name__}")

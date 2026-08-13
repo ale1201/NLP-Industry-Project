@@ -18,7 +18,7 @@ from . import config
 
 # --- tunables -------------------------------------------------------------
 TINY_FONT_PT = 2.0
-NEAR_WHITE = 0.94          # per-channel threshold for "invisible on white paper"
+LOW_CONTRAST = 2.0         # WCAG-style contrast ratio below which text reads as invisible
 LOW_OPACITY = 0.10
 MIN_HIDDEN_CHARS = 12      # ignore stray artefacts; real payloads are wordy
 SHINGLE = 5                # word n-gram width for extractor comparison
@@ -51,6 +51,44 @@ def _rgb(color) -> tuple[float, float, float]:
     return (((c >> 16) & 255) / 255, ((c >> 8) & 255) / 255, (c & 255) / 255)
 
 
+def _page_bg_color(page) -> tuple[float, float, float]:
+    """Best-effort actual page background: the fill color of the largest
+    vector drawing that covers (nearly) the whole page. Falls back to white
+    when no such fill exists — the common case for plain text-only PDFs —
+    which keeps this a no-op for pages that were already scored correctly."""
+    W, H = page.rect.width, page.rect.height
+    best, best_area = None, 0.0
+    try:
+        drawings = page.get_drawings()
+    except Exception:
+        return (1.0, 1.0, 1.0)
+    for d in drawings:
+        fill = d.get("fill")
+        rect = d.get("rect")
+        if fill is None or rect is None:
+            continue
+        if rect.width < W * 0.9 or rect.height < H * 0.9:
+            continue
+        area = rect.width * rect.height
+        if area > best_area:
+            best, best_area = _rgb(fill), area
+    return best if best is not None else (1.0, 1.0, 1.0)
+
+
+def _rel_luminance(rgb) -> float:
+    def lin(u):
+        return u / 12.92 if u <= 0.03928 else ((u + 0.055) / 1.055) ** 2.4
+    r, g, b = rgb
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+
+
+def _contrast_ratio(rgb, bg) -> float:
+    """WCAG-style contrast ratio between text color and page background."""
+    l1, l2 = _rel_luminance(rgb), _rel_luminance(bg)
+    hi, lo = max(l1, l2), min(l1, l2)
+    return (hi + 0.05) / (lo + 0.05)
+
+
 def _signal(sid, title, severity, detail, page=None, evidence=None) -> dict:
     return {
         "id": sid,
@@ -70,14 +108,15 @@ def _scan_spans(doc) -> tuple[list[dict], list[str]]:
     """
     signals: list[dict] = []
     hidden: list[str] = []
-    white_chars = 0
+    low_contrast_chars = 0
     tiny_chars = 0
-    white_ev = tiny_ev = ""
-    white_pg = tiny_pg = None
+    lc_ev = tiny_ev = ""
+    lc_pg = tiny_pg = None
 
     for pno, page in enumerate(doc, start=1):
         if pno > config.MAX_PAGES:
             break
+        bg = _page_bg_color(page)
         try:
             data = page.get_text("dict")
         except Exception:
@@ -91,11 +130,11 @@ def _scan_spans(doc) -> tuple[list[dict], list[str]]:
                         continue
                     n = len(text.strip())
 
-                    r, g, b = _rgb(span.get("color", 0))
-                    if r >= NEAR_WHITE and g >= NEAR_WHITE and b >= NEAR_WHITE:
-                        white_chars += n
-                        white_pg = white_pg or pno
-                        white_ev = white_ev or text.strip()
+                    rgb = _rgb(span.get("color", 0))
+                    if _contrast_ratio(rgb, bg) < LOW_CONTRAST:
+                        low_contrast_chars += n
+                        lc_pg = lc_pg or pno
+                        lc_ev = lc_ev or text.strip()
                         hidden.append(text)
 
                     if float(span.get("size", 12.0)) < TINY_FONT_PT:
@@ -104,16 +143,17 @@ def _scan_spans(doc) -> tuple[list[dict], list[str]]:
                         tiny_ev = tiny_ev or text.strip()
                         hidden.append(text)
 
-    if white_chars >= MIN_HIDDEN_CHARS:
+    if low_contrast_chars >= MIN_HIDDEN_CHARS:
         signals.append(
             _signal(
                 "white-text",
-                "White-on-white text",
+                "Similar background text color",
                 "high",
-                f"{white_chars} characters are drawn in near-white ink and are "
-                "invisible against the page, yet extract as text.",
-                white_pg,
-                white_ev,
+                f"{low_contrast_chars} characters are drawn in a color too close to the "
+                "actual page background to be readable — invisible against the page "
+                "(whatever its color), yet extract as text.",
+                lc_pg,
+                lc_ev,
             )
         )
     if tiny_chars >= MIN_HIDDEN_CHARS:
