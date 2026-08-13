@@ -1,4 +1,4 @@
-# PDF Prompt-Injection Detector
+# PDF Guard Rail: PDF Prompt-Injection Detector
 
 A tool for detecting **hidden prompt injections in PDFs** — text that is invisible to a
 human reader (white-on-white, tiny fonts, off-page, zero-opacity, etc.) but still present
